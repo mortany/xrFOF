@@ -62,6 +62,19 @@ public:
     virtual void OnH_A_Independent();
     virtual void OnEvent(NET_Packet& P, u16 type); // {inherited::OnEvent(P,type);}
 
+    //FFT: STCoP scopes addon
+    bool UseAltScope;
+    void UpdateAltScope();
+    bool ScopeIsHasTexture;
+    shared_str GetNameWithAttachment();
+    int GetScopeX();
+    int GetScopeY();
+    const shared_str GetScopeName() const;
+    bool LoadNewScopes(LPCSTR section);
+    void LoadOriginalScopes(LPCSTR section);
+    bool LoadScopeTexture(LPCSTR section);
+    //End addon section
+
     virtual void Hit(SHit* pHDS);
 
     virtual void reinit();
@@ -156,14 +169,14 @@ public:
     virtual void InitAddons();
 
     //для отоброажения иконок апгрейдов в интерфейсе
-    int GetScopeX() { return pSettings->r_s32(m_scopes[m_cur_scope], "scope_x"); }
-    int GetScopeY() { return pSettings->r_s32(m_scopes[m_cur_scope], "scope_y"); }
+    //int GetScopeX() { return pSettings->r_s32(m_scopes[m_cur_scope], "scope_x"); }
+    //int GetScopeY() { return pSettings->r_s32(m_scopes[m_cur_scope], "scope_y"); }
     int GetSilencerX() { return m_iSilencerX; }
     int GetSilencerY() { return m_iSilencerY; }
     int GetGrenadeLauncherX() { return m_iGrenadeLauncherX; }
     int GetGrenadeLauncherY() { return m_iGrenadeLauncherY; }
     const shared_str& GetGrenadeLauncherName() const { return m_sGrenadeLauncherName; }
-    const shared_str GetScopeName() const { return pSettings->r_string(m_scopes[m_cur_scope], "scope_name"); }
+    //const shared_str GetScopeName() const { return pSettings->r_string(m_scopes[m_cur_scope], "scope_name"); }
     const shared_str& GetSilencerName() const { return m_sSilencerName; }
     IC void ForceUpdateAmmo() { m_BriefInfo_CalcFrame = 0; }
     u8 GetAddonsState() const { return m_flagsAddOnState; };

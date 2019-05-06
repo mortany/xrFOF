@@ -64,7 +64,7 @@ CWeaponMagazined::~CWeaponMagazined()
 
 void CWeaponMagazined::net_Destroy() { inherited::net_Destroy(); }
 
-//AVO: for custom added sounds check if sound exists
+// AVO: for custom added sounds check if sound exists
 bool CWeaponMagazined::WeaponSoundExist(pcstr section, pcstr sound_name) const
 {
     pcstr str;
@@ -87,7 +87,7 @@ void CWeaponMagazined::Load(LPCSTR section)
     m_sounds.LoadSound(section, "snd_draw", "sndShow", false, m_eSoundShow);
     m_sounds.LoadSound(section, "snd_holster", "sndHide", false, m_eSoundHide);
 
-    //Alundaio: LAYERED_SND_SHOOT
+    // Alundaio: LAYERED_SND_SHOOT
     m_layered_sounds.LoadSound(section, "snd_shoot", "sndShot", false, m_eSoundShot);
     //-Alundaio
 
@@ -109,7 +109,7 @@ void CWeaponMagazined::Load(LPCSTR section)
         if (pSettings->line_exist(section, "silencer_smoke_particles"))
             m_sSilencerSmokeParticles = pSettings->r_string(section, "silencer_smoke_particles");
 
-        //Alundaio: LAYERED_SND_SHOOT Silencer
+        // Alundaio: LAYERED_SND_SHOOT Silencer
         m_layered_sounds.LoadSound(section, "snd_silncer_shot", "sndSilencerShot", false, m_eSoundShot);
         if (WeaponSoundExist(section, "snd_silncer_shot_actor"))
             m_layered_sounds.LoadSound(section, "snd_silncer_shot_actor", "sndSilencerShotActor", false, m_eSoundShot);
@@ -180,9 +180,9 @@ void CWeaponMagazined::FireStart()
     }
     else
     { // misfire
-        //Alundaio
+      // Alundaio
 #ifdef EXTENDED_WEAPON_CALLBACKS
-        CGameObject *object = smart_cast<CGameObject*>(H_Parent());
+        CGameObject* object = smart_cast<CGameObject*>(H_Parent());
         if (object)
             object->callback(GameObject::eOnWeaponJammed)(object->lua_game_object(), this->lua_game_object());
 #endif
@@ -531,7 +531,8 @@ void CWeaponMagazined::state_Fire(float dt)
             Log("item_sect", cNameSect().c_str());
             Log("H_Parent", H_Parent()->cNameSect().c_str());
             StopShooting();
-            return; //Alundaio: This is not supposed to happen but it does. GSC was aware but why no return here? Known to cause crash on game load if NPC immediately enters combat.
+            return; // Alundaio: This is not supposed to happen but it does. GSC was aware but why no return here? Known
+                    // to cause crash on game load if NPC immediately enters combat.
         }
 
         CEntity* E = smart_cast<CEntity*>(H_Parent());
@@ -559,13 +560,13 @@ void CWeaponMagazined::state_Fire(float dt)
 
             m_bFireSingleShot = false;
 
-            //Alundaio: Use fModeShotTime instead of fOneShotTime if current fire mode is 2-shot burst
-            //Alundaio: Cycle down RPM after two shots; used for Abakan/AN-94
+            // Alundaio: Use fModeShotTime instead of fOneShotTime if current fire mode is 2-shot burst
+            // Alundaio: Cycle down RPM after two shots; used for Abakan/AN-94
             if (GetCurrentFireMode() == 2 || (cycleDown == true && m_iShotNum <= 1))
                 fShotTimeCounter = modeShotTime;
             else
                 fShotTimeCounter = fOneShotTime;
-            //Alundaio: END
+            // Alundaio: END
 
             ++m_iShotNum;
 
@@ -622,7 +623,7 @@ void CWeaponMagazined::SetDefaults() { CWeapon::SetDefaults(); }
 void CWeaponMagazined::OnShot()
 {
     // Sound
-    //Alundaio: LAYERED_SND_SHOOT
+    // Alundaio: LAYERED_SND_SHOOT
     m_layered_sounds.PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
     //-Alundaio
 
@@ -654,15 +655,9 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
         ReloadMagazine();
         SwitchState(eIdle);
         break; // End of reload animation
-    case eHiding:
-        SwitchState(eHidden);
-        break; // End of Hide
-    case eShowing:
-        SwitchState(eIdle);
-        break; // End of Show
-    case eIdle:
-        switch2_Idle();
-        break; // Keep showing idle
+    case eHiding: SwitchState(eHidden); break; // End of Hide
+    case eShowing: SwitchState(eIdle); break; // End of Show
+    case eIdle: switch2_Idle(); break; // Keep showing idle
     }
     inherited::OnAnimationEnd(state);
 }
@@ -746,7 +741,7 @@ void CWeaponMagazined::PlayReloadSound()
     {
         if (bMisfire)
         {
-            //TODO: make sure correct sound is loaded in CWeaponMagazined::Load(LPCSTR section)
+            // TODO: make sure correct sound is loaded in CWeaponMagazined::Load(LPCSTR section)
             if (m_sounds.FindSoundItem("sndReloadMisfire", false))
                 PlaySound("sndReloadMisfire", get_LastFP());
             else
@@ -856,8 +851,16 @@ bool CWeaponMagazined::CanAttach(PIItem pIItem)
         auto it = m_scopes.begin();
         for (; it != m_scopes.end(); it++)
         {
-            if (pSettings->r_string((*it), "scope_name") == pIItem->object().cNameSect())
-                return true;
+            if (!UseAltScope)
+            {
+                if (pSettings->r_string((*it), "scope_name") == pIItem->object().cNameSect())
+                    return true;
+            }
+            else
+            {
+                if ((*it) == pIItem->object().cNameSect())
+                    return true;
+            }
         }
         return false;
     }
@@ -882,8 +885,16 @@ bool CWeaponMagazined::CanDetach(const char* item_section_name)
         auto it = m_scopes.begin();
         for (; it != m_scopes.end(); it++)
         {
-            if (pSettings->r_string((*it), "scope_name") == item_section_name)
-                return true;
+            if (!UseAltScope)
+            {
+                if (pSettings->r_string((*it), "scope_name") == item_section_name)
+                    return true;
+            }
+            else
+            {
+                if (strcmp((*it).c_str(), item_section_name) == 0)
+                    return true;
+            }
         }
         return false;
     }
@@ -914,8 +925,16 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
         auto it = m_scopes.begin();
         for (; it != m_scopes.end(); it++)
         {
-            if (pSettings->r_string((*it), "scope_name") == pIItem->object().cNameSect())
-                m_cur_scope = u8(it - m_scopes.begin());
+            if (!UseAltScope)
+            {
+                if (pSettings->r_string((*it), "scope_name") == pIItem->object().cNameSect())
+                    m_cur_scope = u8(it - m_scopes.begin());
+            }
+            else
+            {
+                if ((*it) == pIItem->object().cNameSect())
+                    m_cur_scope = u8(it - m_scopes.begin());
+            }
         }
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonScope;
         result = true;
@@ -943,7 +962,7 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
             //.			pIItem->Drop					();
             pIItem->object().DestroyObject();
         };
-
+        UpdateAltScope();
         UpdateAddonsVisibility();
         InitAddons();
 
@@ -956,10 +975,19 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 bool CWeaponMagazined::DetachScope(const char* item_section_name, bool b_spawn_item)
 {
     bool detached = false;
+    LPCSTR iter_scope_name;
     auto it = m_scopes.begin();
     for (; it != m_scopes.end(); it++)
     {
-        LPCSTR iter_scope_name = pSettings->r_string((*it), "scope_name");
+        if (!UseAltScope)
+        {
+            iter_scope_name = pSettings->r_string((*it), "scope_name");
+        }
+        else
+        {
+            iter_scope_name = (*it).c_str();
+        }
+        // LPCSTR iter_scope_name = pSettings->r_string((*it), "scope_name");
         if (!xr_strcmp(iter_scope_name, item_section_name))
         {
             m_cur_scope = 0;
@@ -979,7 +1007,7 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item)
             return true;
         }
         m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonScope;
-
+        UpdateAltScope();
         UpdateAddonsVisibility();
         InitAddons();
 
@@ -1032,29 +1060,38 @@ void CWeaponMagazined::InitAddons()
         shared_str scope_tex_name;
         if (m_eScopeStatus == ALife::eAddonAttachable)
         {
-            // m_scopes[cur_scope]->m_sScopeName = pSettings->r_string(cNameSect(), "scope_name");
-            // m_scopes[cur_scope]->m_iScopeX	 = pSettings->r_s32(cNameSect(),"scope_x");
-            // m_scopes[cur_scope]->m_iScopeY	 = pSettings->r_s32(cNameSect(),"scope_y");
-
-            scope_tex_name = pSettings->r_string(GetScopeName(), "scope_texture");
+            ScopeIsHasTexture = LoadScopeTexture(GetScopeName().c_str());
             m_zoom_params.m_fScopeZoomFactor = pSettings->r_float(GetScopeName(), "scope_zoom_factor");
-            m_zoom_params.m_sUseZoomPostprocess =
-                READ_IF_EXISTS(pSettings, r_string, GetScopeName(), "scope_nightvision", 0);
-            m_zoom_params.m_bUseDynamicZoom =
-                READ_IF_EXISTS(pSettings, r_bool, GetScopeName(), "scope_dynamic_zoom", false);
-            m_zoom_params.m_sUseBinocularVision =
-                READ_IF_EXISTS(pSettings, r_string, GetScopeName(), "scope_alive_detector", 0);
             m_fRTZoomFactor = m_zoom_params.m_fScopeZoomFactor;
-            if (m_UIScope)
-            {
-                xr_delete(m_UIScope);
-            }
-
             if (!GEnv.isDedicatedServer)
             {
-                m_UIScope = new CUIWindow();
-                createWpnScopeXML();
-                CUIXmlInit::InitWindow(*pWpnScopeXml, scope_tex_name.c_str(), 0, m_UIScope);
+                if (ScopeIsHasTexture)
+                {
+                    m_zoom_params.m_sUseZoomPostprocess =
+                        READ_IF_EXISTS(pSettings, r_string, GetScopeName(), "scope_nightvision", 0);
+                    m_zoom_params.m_bUseDynamicZoom =
+                        READ_IF_EXISTS(pSettings, r_bool, GetScopeName(), "scope_dynamic_zoom", false);
+                    m_zoom_params.m_sUseBinocularVision =
+                        READ_IF_EXISTS(pSettings, r_string, GetScopeName(), "scope_alive_detector", 0);
+                }
+            }
+        }
+        else if (m_eScopeStatus == ALife::eAddonPermanent)
+        {
+            m_zoom_params.m_fScopeZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
+            m_fRTZoomFactor = m_zoom_params.m_fScopeZoomFactor;
+            if (!GEnv.isDedicatedServer)
+            {
+                ScopeIsHasTexture = LoadScopeTexture(cNameSect().c_str());
+                if (ScopeIsHasTexture)
+                {
+                    m_zoom_params.m_sUseZoomPostprocess =
+                        READ_IF_EXISTS(pSettings, r_string, cNameSect(), "scope_nightvision", 0);
+                    m_zoom_params.m_bUseDynamicZoom =
+                        READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "scope_dynamic_zoom", false);
+                    m_zoom_params.m_sUseBinocularVision =
+                        READ_IF_EXISTS(pSettings, r_string, cNameSect(), "scope_alive_detector", 0);
+                }
             }
         }
     }
@@ -1177,11 +1214,11 @@ void CWeaponMagazined::OnZoomIn()
     if (GetState() == eIdle)
         PlayAnimIdle();
 
-    //Alundaio: callback not sure why vs2013 gives error, it's fine
+        // Alundaio: callback not sure why vs2013 gives error, it's fine
 #ifdef EXTENDED_WEAPON_CALLBACKS
-    CGameObject *object = smart_cast<CGameObject*>(H_Parent());
+    CGameObject* object = smart_cast<CGameObject*>(H_Parent());
     if (object)
-        object->callback(GameObject::eOnWeaponZoomIn)(object->lua_game_object(),this->lua_game_object());
+        object->callback(GameObject::eOnWeaponZoomIn)(object->lua_game_object(), this->lua_game_object());
 #endif
     //-Alundaio
 
@@ -1208,9 +1245,9 @@ void CWeaponMagazined::OnZoomOut()
     if (GetState() == eIdle)
         PlayAnimIdle();
 
-    //Alundaio
+        // Alundaio
 #ifdef EXTENDED_WEAPON_CALLBACKS
-    CGameObject *object = smart_cast<CGameObject*>(H_Parent());
+    CGameObject* object = smart_cast<CGameObject*>(H_Parent());
     if (object)
         object->callback(GameObject::eOnWeaponZoomOut)(object->lua_game_object(), this->lua_game_object());
 #endif
@@ -1351,12 +1388,12 @@ bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
     {
         info.fmj_ammo._set("--");
         info.ap_ammo._set("--");
-        info.third_ammo._set("--"); //Alundaio
+        info.third_ammo._set("--"); // Alundaio
     }
     else
     {
         // GetSuitableAmmoTotal(); //mp = all type
-        //Alundaio: Added third ammo type and cleanup
+        // Alundaio: Added third ammo type and cleanup
         info.fmj_ammo._set("");
         info.ap_ammo._set("");
         info.third_ammo._set("");

@@ -79,6 +79,8 @@ public:
     virtual void FireEnd();
     virtual void Reload();
 
+    virtual bool UseScopeTexture() { return ScopeIsHasTexture; };
+
     virtual void UpdateCL();
     virtual void net_Destroy();
     virtual void net_Export(NET_Packet& P);
@@ -146,7 +148,8 @@ public:
 
     int GetCurrentFireMode() override
     {
-        //AVO: fixed crash due to original GSC assumption that CWeaponMagazined will always have firemodes specified in configs.
+        // AVO: fixed crash due to original GSC assumption that CWeaponMagazined will always have firemodes specified in
+        // configs.
         if (HasFireModes())
             return m_aFireModes[m_iCurFireMode];
         return 1;
@@ -174,10 +177,10 @@ protected:
     virtual void FireBullet(const Fvector& pos, const Fvector& dir, float fire_disp, const CCartridge& cartridge,
         u16 parent_id, u16 weapon_id, bool send_hit);
 
-    //AVO: for custom added sounds check if sound exists
+    // AVO: for custom added sounds check if sound exists
     bool WeaponSoundExist(pcstr section, pcstr sound_name) const;
 
-    //Alundaio: LAYERED_SND_SHOOT
+    // Alundaio: LAYERED_SND_SHOOT
     HUD_SOUND_COLLECTION_LAYERED m_layered_sounds;
     //-Alundaio
 };
