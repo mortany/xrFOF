@@ -35,6 +35,7 @@ SCRIPT_EXPORT(CScriptObjectAction, (), {
                              value("use", int(MonsterSpace::eObjectActionUse)),
                              value("turn_on", int(MonsterSpace::eObjectActionTurnOn)),
                              value("turn_off", int(MonsterSpace::eObjectActionTurnOff)),
+                             value("aim_force_full1", int(MonsterSpace::eObjectActionAimForceFull1)),
                              value("dummy", int(MonsterSpace::eObjectActionDummy))]
                          .def(constructor<>())
                          .def(constructor<CScriptGameObject*, MonsterSpace::EObjectAction>())

@@ -694,8 +694,9 @@ public:
     }
 };
 
-ENGINE_API float g_fov = 55.0f;
-ENGINE_API float psHUD_FOV = 0.45f;
+ENGINE_API float g_fov = 75.0f; //--#SM+#-- 55.f
+ENGINE_API float psHUD_FOV_def = 0.35f; //--#SM+#--	Дефолтный HUD FOV (В % от Camera FOV) [default hud_fov (perc. of g_fov)]
+ENGINE_API float psHUD_FOV = psHUD_FOV_def; //--#SM+#-- Текущий HUD FOV (В % от Camera FOV) [current hud_fov (perc. of g_fov)]
 
 // extern int psSkeletonUpdate;
 extern int rsDVB_Size;

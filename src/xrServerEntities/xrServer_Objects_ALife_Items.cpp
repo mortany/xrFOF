@@ -457,7 +457,7 @@ CSE_ALifeItemWeapon::CSE_ALifeItemWeapon(LPCSTR caSection) : CSE_ALifeItem(caSec
     wpn_flags = 0;
     wpn_state = 0;
     ammo_type = 0;
-    cur_scope = 0;
+    cur_scope = u8(-1);
 
     m_fHitPower = pSettings->r_float(caSection, "hit_power");
     m_tHitType = ALife::g_tfString2HitType(pSettings->r_string(caSection, "hit_type"));
@@ -498,7 +498,6 @@ void CSE_ALifeItemWeapon::UPDATE_Read(NET_Packet& tNetPacket)
     tNetPacket.r_u8(ammo_type);
     tNetPacket.r_u8(wpn_state);
     tNetPacket.r_u8(m_bZoom);
-    tNetPacket.r_u8(cur_scope);
 }
 
 void CSE_ALifeItemWeapon::clone_addons(CSE_ALifeItemWeapon* parent) { m_addon_flags = parent->m_addon_flags; }
@@ -513,7 +512,6 @@ void CSE_ALifeItemWeapon::UPDATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_u8(ammo_type);
     tNetPacket.w_u8(wpn_state);
     tNetPacket.w_u8(m_bZoom);
-    tNetPacket.w_u8(cur_scope);
 }
 
 void CSE_ALifeItemWeapon::STATE_Read(NET_Packet& tNetPacket, u16 size)

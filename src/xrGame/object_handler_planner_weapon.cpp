@@ -337,7 +337,7 @@ void CObjectHandlerPlanner::add_operators(CWeapon* weapon)
     add_operator(uid(id, eWorldOperatorAimingReady2), action);
 
     // force aim full 1
-    action = new CObjectActionAim(weapon, m_object, &m_storage, eWorldPropertyAimed1, true, "aim_ready1");
+    action = new CObjectActionAim(weapon, m_object, &m_storage, eWorldPropertyAimed1, true, "aim_force_full1");
     add_condition(action, id, eWorldPropertyHidden, false);
     add_condition(action, id, eWorldPropertySwitch1, true);
     add_condition(action, id, eWorldPropertyReady1, true);
@@ -351,7 +351,7 @@ void CObjectHandlerPlanner::add_operators(CWeapon* weapon)
     add_operator(uid(id, eWorldOperatorAimForceFull1), action);
 
     // force aim full 2
-    action = new CObjectActionAim(weapon, m_object, &m_storage, eWorldPropertyAimed2, true, "aim_ready2");
+    action = new CObjectActionAim(weapon, m_object, &m_storage, eWorldPropertyAimed2, true, "aim_force_full2");
     add_condition(action, id, eWorldPropertyHidden, false);
     add_condition(action, id, eWorldPropertySwitch2, true);
     add_condition(action, id, eWorldPropertyReady2, true);

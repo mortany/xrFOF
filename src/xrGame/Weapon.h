@@ -73,6 +73,16 @@ public:
     bool LoadNewScopes(LPCSTR section);
     void LoadOriginalScopes(LPCSTR section);
     bool LoadScopeTexture(LPCSTR section);
+    bool bScopeIsLoaded;
+
+    float m_hud_fov_add_mod;
+    float m_nearwall_dist_max;
+    float m_nearwall_dist_min;
+    float m_nearwall_last_hud_fov;
+    float m_nearwall_target_hud_fov;
+    float m_nearwall_speed_mod;
+
+    float GetHudFov();
     //End addon section
 
     virtual void Hit(SHit* pHDS);
