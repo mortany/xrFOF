@@ -66,6 +66,8 @@
 
 #define CLSID_ARTEFACT MK_CLSID('A', 'R', 'T', 'E', 'F', 'A', 'C', 'T')
 
+#define CLSID_OBJECT_ARTCONT MK_CLSID('A', 'R', 'T', '_', 'C', 'O', 'N','T')
+
 // Weapons
 #define CLSID_OBJECT_W_M134 MK_CLSID('W', '_', 'M', '1', '3', '4', ' ', ' ')
 #define CLSID_OBJECT_W_FN2000 MK_CLSID('W', '_', 'F', 'N', '2', '0', '0', '0')

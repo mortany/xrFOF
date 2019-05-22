@@ -21,6 +21,7 @@
 #include "static_cast_checked.hpp"
 #include "player_hud.h"
 #include "xrNetServer/NET_Messages.h"
+#include "ArtContainer.h"
 
 using namespace InventoryUtilities;
 
@@ -920,6 +921,22 @@ PIItem CInventory::Get(LPCSTR name, bool bSearchRuck) const
     }
     return NULL;
 }
+
+ PIItem CInventory::GetFreeArtCont(CLASS_ID cls_id) const
+ {
+     for (TIItemContainer::const_iterator it = m_ruck.begin(); m_ruck.end() != it; ++it)
+     {
+         PIItem pIItem = *it;
+         if (pIItem->object().CLS_ID == cls_id && pIItem->Useful())
+         {
+             CArtefactContainer* pArtCont = smart_cast<CArtefactContainer*>(pIItem);
+             if (pArtCont && pArtCont->IsHasFreeSlot())
+                 return pIItem;
+         }
+             
+     }
+     return NULL;
+ }
 
 PIItem CInventory::Get(CLASS_ID cls_id, bool bSearchRuck) const
 {

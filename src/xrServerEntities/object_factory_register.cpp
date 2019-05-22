@@ -174,6 +174,7 @@
 #include "space_restrictor.h"
 #include "smart_zone.h"
 #include "InventoryBox.h"
+#include "ArtContainer.h"
 
 #include "actor_mp_server.h"
 #include "actor_mp_client.h"
@@ -274,6 +275,7 @@ void CObjectFactory::register_classes()
     ADD(CGraviArtefact, CSE_ALifeItemArtefact, CLSID_ARTEFACT, "artefact");
     ADD(CtaGameArtefact, CSE_ALifeItemArtefact, CLSID_AF_CTA, "art_cta");
 
+    ADD(CArtefactContainer, CSE_ALifeItem, CLSID_OBJECT_ARTCONT, "art_cont");
     //  [8/15/2006]
     ADD(CWeaponMagazined, CSE_ALifeItemWeaponMagazined, CLSID_OBJECT_W_MAGAZINED, "wpn_wmagaz");
     //  [8/15/2006]
@@ -426,7 +428,7 @@ void CObjectFactory::register_classes()
     ADD(CMosquitoBald, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_MBALD"), "zone_mbald_s");
     ADD(CMincer, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_GALAN"), "zone_galant_s");
     ADD(CMincer, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_MINCE"), "zone_mincer_s");
-    ADD(CAmebaZone, CSE_ALifeZoneVisual	, TEXT2CLSID("ZS_AMEBA"), "zone_ameba_s");
+    ADD(CAmebaZone, CSE_ALifeZoneVisual, TEXT2CLSID("ZS_AMEBA"), "zone_ameba_s");
     ADD(CNoGravityZone, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_NGRAV"), "zone_nograv_s");
     ADD(CSpaceRestrictor, CSE_ALifeSpaceRestrictor, TEXT2CLSID("SPC_RS_S"), "script_restr");
 #endif // NO_XR_GAME

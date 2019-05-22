@@ -36,6 +36,7 @@ public:
     void Init(CUIXml& xml, LPCSTR section);
     void SetCaption(LPCSTR name);
     void SetValue(float value);
+    CUITextWnd* get_value() { return m_value; }
 
 private:
     CUIStatic* m_caption;

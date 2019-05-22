@@ -739,6 +739,7 @@
     <ClInclude Include="AnselManager.h" />
     <ClInclude Include="anticheat_dumpable_object.h" />
     <ClInclude Include="antirad.h" />
+    <ClInclude Include="ArtContainer.h" />
     <ClInclude Include="Artefact.h" />
     <ClInclude Include="artefact_activation.h" />
     <ClInclude Include="atlas_stalkercoppc_v1.h" />
@@ -1489,6 +1490,7 @@
     <ClInclude Include="ui\ChangeWeatherDialog.hpp" />
     <ClInclude Include="ui\UICharacterInfo.h" />
     <ClInclude Include="ui\UIChatWnd.h" />
+    <ClInclude Include="ui\UIContainerInfo.h" />
     <ClInclude Include="ui\UIDebugFonts.h" />
     <ClInclude Include="ui\UIDemoPlayControl.h" />
     <ClInclude Include="ui\UIDialogWnd.h" />
@@ -2213,6 +2215,7 @@
     <ClCompile Include="animation_utils.cpp" />
     <ClCompile Include="AnselManager.cpp" />
     <ClCompile Include="antirad.cpp" />
+    <ClCompile Include="ArtContainer.cpp" />
     <ClCompile Include="Artefact.cpp" />
     <ClCompile Include="artefact_activation.cpp" />
     <ClCompile Include="artefact_script.cpp">
@@ -3407,6 +3410,7 @@
     <ClCompile Include="ui\ChangeWeatherDialog.cpp" />
     <ClCompile Include="ui\UICharacterInfo.cpp" />
     <ClCompile Include="ui\UIChatWnd.cpp" />
+    <ClCompile Include="ui\UIContainerInfo.cpp" />
     <ClCompile Include="ui\UIDebugFonts.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

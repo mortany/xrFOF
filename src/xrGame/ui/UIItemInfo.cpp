@@ -19,9 +19,11 @@
 #include "Weapon.h"
 #include "CustomOutfit.h"
 #include "ActorHelmet.h"
+#include "ArtContainer.h"
 #include "eatable_item.h"
 #include "UICellItem.h"
 #include "xrGame/game_type.h"
+#include "UIContainerInfo.h"
 
 extern const LPCSTR g_inventory_upgrade_xml;
 
@@ -45,6 +47,7 @@ CUIItemInfo::CUIItemInfo()
     UIArtefactParams = NULL;
     UIName = NULL;
     UIBackground = NULL;
+    UI_fft_Info = NULL;
     m_pInvItem = NULL;
     m_b_FitToHeight = false;
     m_complex_desc = false;
@@ -58,6 +61,7 @@ CUIItemInfo::~CUIItemInfo()
     xr_delete(UIProperties);
     xr_delete(UIOutfitInfo);
     xr_delete(UIBoosterInfo);
+    xr_delete(UI_fft_Info);
 }
 
 void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
@@ -131,6 +135,9 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
 
         UIBoosterInfo = new CUIBoosterInfo();
         UIBoosterInfo->InitFromXml(uiXml);
+
+        UI_fft_Info = new CUI_FFT_ItemsInfo();
+        UI_fft_Info->InitFromXml(uiXml);
 
         // UIDesc_line						= new CUIStatic();
         // AttachChild						(UIDesc_line);
@@ -300,6 +307,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
         TryAddOutfitInfo(*pInvItem, pCompareItem);
         TryAddUpgradeInfo(*pInvItem);
         TryAddBoosterInfo(*pInvItem);
+        TryAddFFTInfo(*pInvItem);
 
         if (m_b_FitToHeight)
         {
@@ -393,6 +401,16 @@ void CUIItemInfo::TryAddUpgradeInfo(CInventoryItem& pInvItem)
     {
         UIProperties->set_item_info(pInvItem);
         UIDesc->AddWindow(UIProperties, false);
+    }
+}
+
+void CUIItemInfo::TryAddFFTInfo(CInventoryItem& pInvItem)
+{ 
+    CArtefactContainer* box = smart_cast<CArtefactContainer*>(&pInvItem);
+    if (box && UI_fft_Info)
+    {
+        UI_fft_Info->SetInfo(pInvItem.object().cNameSect(), box->m_items_name);
+        UIDesc->AddWindow(UI_fft_Info, false);
     }
 }
 

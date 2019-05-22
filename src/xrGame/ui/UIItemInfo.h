@@ -14,6 +14,7 @@ class UIInvUpgPropertiesWnd;
 class CUIOutfitInfo;
 class CUIBoosterInfo;
 class CUICellItem;
+class CUI_FFT_ItemsInfo;
 
 extern const char* const fieldsCaptionColor;
 
@@ -45,6 +46,7 @@ public:
     void TryAddOutfitInfo(CInventoryItem& pInvItem, CInventoryItem* pCompareItem);
     void TryAddUpgradeInfo(CInventoryItem& pInvItem);
     void TryAddBoosterInfo(CInventoryItem& pInvItem);
+    void TryAddFFTInfo(CInventoryItem& pInvItem);
 
     virtual void Draw();
     bool m_b_FitToHeight;
@@ -65,6 +67,7 @@ public:
     UIInvUpgPropertiesWnd* UIProperties;
     CUIOutfitInfo* UIOutfitInfo;
     CUIBoosterInfo* UIBoosterInfo;
+    CUI_FFT_ItemsInfo* UI_fft_Info;
 
     Fvector2 UIItemImageSize;
     CUIStatic* UIItemImage;

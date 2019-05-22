@@ -361,60 +361,6 @@
     <Filter Include="AI\ALife\interaction_manager\combat_manager">
       <UniqueIdentifier>{25f5bb8e-15a5-444b-a27e-b07400207e51}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\ALife\simulator_base">
-      <UniqueIdentifier>{bd6777eb-8459-4f12-9c16-ec2bd54619dd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\header">
-      <UniqueIdentifier>{45f859e7-642e-4231-987d-36ae06ef0ec5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\registries">
-      <UniqueIdentifier>{1d112957-ea53-4186-af03-d1419fde255d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\registries\abstract_registry">
-      <UniqueIdentifier>{391c528a-659d-404f-932f-2bce47a5b4c2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\registries\graph_registry">
-      <UniqueIdentifier>{84bf9ab8-c1c2-48cd-9401-1dae87ba88fc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\registries\graph_registry\level_registry">
-      <UniqueIdentifier>{9f875b3b-ecd0-4049-96ca-4d40d6a61ae0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\registries\group_registry">
-      <UniqueIdentifier>{bf38f1d3-f6c9-4588-846b-0fdd35fe0611}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\registries\object_registry">
-      <UniqueIdentifier>{8126eabc-1f2b-438f-92ab-f0a769b0f170}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\registries\safe_map_iterator">
-      <UniqueIdentifier>{ad65812c-9e12-48d0-9d26-0e9afd32ba5b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\registries\schedule_registry">
-      <UniqueIdentifier>{f097040d-9e21-4dc7-9d68-dc34a26e8870}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\registries\smart_terrain_registry">
-      <UniqueIdentifier>{67334a84-25d7-4c60-9c2c-3ec521f7fc08}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\registries\spawn_registry">
-      <UniqueIdentifier>{045353b9-b4b0-43f8-a413-f2e2ef514664}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\registries\spawn_registry\header">
-      <UniqueIdentifier>{60f9d27a-bd27-408d-a197-39c5b8b4fc6a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\registries\spawn_registry\server_entity_wrapper">
-      <UniqueIdentifier>{46435b3b-ec26-4c0e-b864-f519ab595a76}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\registries\story_registry">
-      <UniqueIdentifier>{b7974df0-43f4-41e2-ab5e-aa765b59d3d0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\registry_container">
-      <UniqueIdentifier>{6838cc47-e048-4f8c-aa29-afbaa1dfb72b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\smart_terrain_task">
-      <UniqueIdentifier>{42710f2c-6b42-42a4-b106-bbf1b5bf62f8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ALife\simulator_base\time_manager">
-      <UniqueIdentifier>{1de5d310-2562-4055-8e09-63dcb806231a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\ALife\update_manager">
       <UniqueIdentifier>{bdaa7d95-49af-4af2-aff1-ee89603f1d2f}</UniqueIdentifier>
     </Filter>
@@ -2247,6 +2193,63 @@
     </Filter>
     <Filter Include="Core\Client\Ansel">
       <UniqueIdentifier>{5774e461-6abd-4bcb-888c-af7a7d5ab679}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Client\Objects\items &amp; weapons\Container">
+      <UniqueIdentifier>{f9a92d10-30b7-4f50-b066-b99d113639e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base">
+      <UniqueIdentifier>{bd6777eb-8459-4f12-9c16-ec2bd54619dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\header">
+      <UniqueIdentifier>{45f859e7-642e-4231-987d-36ae06ef0ec5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\registries">
+      <UniqueIdentifier>{1d112957-ea53-4186-af03-d1419fde255d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\registries\abstract_registry">
+      <UniqueIdentifier>{391c528a-659d-404f-932f-2bce47a5b4c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\registries\graph_registry">
+      <UniqueIdentifier>{84bf9ab8-c1c2-48cd-9401-1dae87ba88fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\registries\graph_registry\level_registry">
+      <UniqueIdentifier>{9f875b3b-ecd0-4049-96ca-4d40d6a61ae0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\registries\group_registry">
+      <UniqueIdentifier>{bf38f1d3-f6c9-4588-846b-0fdd35fe0611}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\registries\object_registry">
+      <UniqueIdentifier>{8126eabc-1f2b-438f-92ab-f0a769b0f170}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\registries\safe_map_iterator">
+      <UniqueIdentifier>{ad65812c-9e12-48d0-9d26-0e9afd32ba5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\registries\schedule_registry">
+      <UniqueIdentifier>{f097040d-9e21-4dc7-9d68-dc34a26e8870}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\registries\smart_terrain_registry">
+      <UniqueIdentifier>{67334a84-25d7-4c60-9c2c-3ec521f7fc08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\registries\spawn_registry">
+      <UniqueIdentifier>{045353b9-b4b0-43f8-a413-f2e2ef514664}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\registries\spawn_registry\header">
+      <UniqueIdentifier>{60f9d27a-bd27-408d-a197-39c5b8b4fc6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\registries\spawn_registry\server_entity_wrapper">
+      <UniqueIdentifier>{46435b3b-ec26-4c0e-b864-f519ab595a76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\registries\story_registry">
+      <UniqueIdentifier>{b7974df0-43f4-41e2-ab5e-aa765b59d3d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\registry_container">
+      <UniqueIdentifier>{6838cc47-e048-4f8c-aa29-afbaa1dfb72b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\smart_terrain_task">
+      <UniqueIdentifier>{42710f2c-6b42-42a4-b106-bbf1b5bf62f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ALife\simulator_base\time_manager">
+      <UniqueIdentifier>{1de5d310-2562-4055-8e09-63dcb806231a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -6470,6 +6473,12 @@
     <ClInclude Include="ui\UILoadingScreenHardcoded.h">
       <Filter>UI\Common\LoadingScreen</Filter>
     </ClInclude>
+    <ClInclude Include="ArtContainer.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIContainerInfo.h">
+      <Filter>UI\Common\ui-item-infos</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9803,6 +9812,12 @@
     </ClCompile>
     <ClCompile Include="AnselManager.cpp">
       <Filter>Core\Client\Ansel</Filter>
+    </ClCompile>
+    <ClCompile Include="ArtContainer.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Container</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIContainerInfo.cpp">
+      <Filter>UI\Common\ui-item-infos</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

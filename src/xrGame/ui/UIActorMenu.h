@@ -201,6 +201,7 @@ private:
     void PropertiesBoxForWeapon(CUICellItem* cell_item, PIItem item, bool& b_show);
     void PropertiesBoxForAddon(PIItem item, bool& b_show);
     void PropertiesBoxForUsing(PIItem item, bool& b_show);
+    void PropertiesBoxForArtefact(PIItem, bool& b_show);
     void PropertiesBoxForPlaying(PIItem item, bool& b_show);
     void PropertiesBoxForDrop(CUICellItem* cell_item, PIItem item, bool& b_show);
     void PropertiesBoxForRepair(PIItem item, bool& b_show);
@@ -360,6 +361,11 @@ public:
     void UpdateConditionProgressBars();
 
     IC UIHint* get_hint_wnd() { return m_hint_wnd; }
+
+    //FFTAddon
+    //void MoveToArtcont(CUICellItem* cell_item);
+
+    //End
 
     void RefreshCurrentItemCell();
     void DonateCurrentItem(CUICellItem* cell_item); //Alundaio: Donate item via context menu while in trade menu

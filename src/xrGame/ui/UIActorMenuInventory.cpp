@@ -33,6 +33,7 @@
 #include "CustomDetector.h"
 #include "PDA.h"
 #include "actor_defs.h"
+#include "ArtContainer.h"
 
 void move_item_from_to(u16 from_id, u16 to_id, u16 what_id);
 
@@ -376,7 +377,7 @@ void CUIActorMenu::DetachAddon(LPCSTR addon_name, PIItem itm)
 
 void CUIActorMenu::InitCellForSlot(u16 slot_idx)
 {
-    //VERIFY(KNIFE_SLOT <= slot_idx && slot_idx <= LAST_SLOT);
+    // VERIFY(KNIFE_SLOT <= slot_idx && slot_idx <= LAST_SLOT);
     PIItem item = m_pActorInvOwner->inventory().ItemFromSlot(slot_idx);
     if (!item)
     {
@@ -414,7 +415,7 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
     InitCellForSlot(GRENADE_SLOT);
     InitCellForSlot(HELMET_SLOT);
 
-    //Alundaio
+    // Alundaio
     if (!m_pActorInvOwner->inventory().SlotIsPersistent(KNIFE_SLOT))
         InitCellForSlot(KNIFE_SLOT);
     if (!m_pActorInvOwner->inventory().SlotIsPersistent(BINOCULAR_SLOT))
@@ -424,7 +425,7 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
     if (!m_pActorInvOwner->inventory().SlotIsPersistent(PDA_SLOT))
         InitCellForSlot(PDA_SLOT);
     if (!m_pActorInvOwner->inventory().SlotIsPersistent(TORCH_SLOT))
-        InitCellForSlot(TORCH_SLOT); //Alundaio: TODO find out why this crash when you unequip
+        InitCellForSlot(TORCH_SLOT); // Alundaio: TODO find out why this crash when you unequip
     //-Alundaio
 
     curr_list = m_pInventoryBeltList;
@@ -507,7 +508,7 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
     {
         CUIDragDropListEx* new_owner = GetSlotList(slot_id);
 
-        //Alundaio
+        // Alundaio
         if (!new_owner)
             return true;
 
@@ -515,7 +516,8 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
         {
             return true; // fake, sorry (((
         }
-        else*/ if (slot_id == OUTFIT_SLOT)
+        else*/
+        if (slot_id == OUTFIT_SLOT)
         {
             CCustomOutfit* pOutfit = smart_cast<CCustomOutfit*>(iitem);
             if (pOutfit && !pOutfit->bIsHelmetAvaliable)
@@ -588,7 +590,8 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
         }
         else
         {
-            //Alundaio: Since the player's inventory is being used as a slot we need to search for cell with matching m_pData
+            // Alundaio: Since the player's inventory is being used as a slot we need to search for cell with matching
+            // m_pData
             auto container = slot_list->GetContainer();
             auto child_list = container->GetChildWndList();
             for (auto& it : child_list)
@@ -777,7 +780,7 @@ bool CUIActorMenu::TryUseItem(CUICellItem* cell_itm)
         return false;
     }
 
-    //cell_itm->UpdateConditionProgressBar(); //Alundaio
+    // cell_itm->UpdateConditionProgressBar(); //Alundaio
 
     u16 recipient = m_pActorInvOwner->object_id();
     if (item->parent_id() != recipient)
@@ -788,7 +791,7 @@ bool CUIActorMenu::TryUseItem(CUICellItem* cell_itm)
 
     SendEvent_Item_Eat(item, recipient);
     PlaySnd(eItemUse);
-    //SetCurrentItem(nullptr);
+    // SetCurrentItem(nullptr);
     return true;
 }
 
@@ -799,11 +802,11 @@ bool CUIActorMenu::ToQuickSlot(CUICellItem* itm)
     if (!eat_item)
         return false;
 
-    //Alundaio: Fix deep recursion if placing icon greater then col/row set in actor_menu.xml
+    // Alundaio: Fix deep recursion if placing icon greater then col/row set in actor_menu.xml
     Ivector2 iWH = iitem->GetInvGridRect().rb;
     if (iWH.x > 1 || iWH.y > 1)
         return false;
-    //Alundaio: END
+    // Alundaio: END
 
     u8 slot_idx = u8(m_pQuickSlot->PickCell(GetUICursor().GetCursorPosition()).x);
     if (slot_idx == 255)
@@ -843,7 +846,8 @@ void CUIActorMenu::TryHidePropertiesBox()
 void CUIActorMenu::ActivatePropertiesBox()
 {
     TryHidePropertiesBox();
-    if (!(m_currMenuMode == mmInventory || m_currMenuMode == mmDeadBodySearch || m_currMenuMode == mmUpgrade || m_currMenuMode == mmTrade))
+    if (!(m_currMenuMode == mmInventory || m_currMenuMode == mmDeadBodySearch || m_currMenuMode == mmUpgrade ||
+            m_currMenuMode == mmTrade))
     {
         return;
     }
@@ -864,6 +868,7 @@ void CUIActorMenu::ActivatePropertiesBox()
         PropertiesBoxForWeapon(cell_item, item, b_show);
         PropertiesBoxForAddon(item, b_show);
         PropertiesBoxForUsing(item, b_show);
+        PropertiesBoxForArtefact(item, b_show);
         PropertiesBoxForPlaying(item, b_show);
         if (m_currMenuMode == mmInventory)
             PropertiesBoxForDrop(cell_item, item, b_show);
@@ -876,7 +881,7 @@ void CUIActorMenu::ActivatePropertiesBox()
     {
         PropertiesBoxForRepair(item, b_show);
     }
-    //Alundaio: Ability to donate item to npc during trade
+    // Alundaio: Ability to donate item to npc during trade
     else if (m_currMenuMode == mmTrade)
     {
         CUIDragDropListEx* invlist = GetListByType(iActorBag);
@@ -908,8 +913,8 @@ void CUIActorMenu::PropertiesBoxForSlots(PIItem item, bool& b_show)
     bool bAlreadyDressed = false;
     u16 cur_slot = item->BaseSlot();
 
-    if (!pOutfit && !pHelmet && cur_slot != NO_ACTIVE_SLOT && !inv.SlotIsPersistent(cur_slot) && m_pActorInvOwner->
-        inventory().ItemFromSlot(cur_slot) != item /*&& inv.CanPutInSlot(item, cur_slot)*/)
+    if (!pOutfit && !pHelmet && cur_slot != NO_ACTIVE_SLOT && !inv.SlotIsPersistent(cur_slot) &&
+        m_pActorInvOwner->inventory().ItemFromSlot(cur_slot) != item /*&& inv.CanPutInSlot(item, cur_slot)*/)
     {
         m_UIPropertiesBox->AddItem("st_move_to_slot", NULL, INVENTORY_TO_SLOT_ACTION);
         b_show = true;
@@ -1088,7 +1093,7 @@ void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
             str.printf("%s %s", str.c_str(), item_in_slot_2->m_name.c_str());
             m_UIPropertiesBox->AddItem(str.c_str(), (void*)item_in_slot_2, INVENTORY_ATTACH_ADDON);
             //			m_UIPropertiesBox->AddItem( "st_attach_gl_to_pistol",  (void*)item_in_slot_2,
-            //INVENTORY_ATTACH_ADDON
+            // INVENTORY_ATTACH_ADDON
             //);
             b_show = true;
         }
@@ -1098,8 +1103,42 @@ void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
             str.printf("%s %s", str.c_str(), item_in_slot_3->m_name.c_str());
             m_UIPropertiesBox->AddItem(str.c_str(), (void*)item_in_slot_3, INVENTORY_ATTACH_ADDON);
             //			m_UIPropertiesBox->AddItem( "st_attach_gl_to_rifle",  (void*)item_in_slot_3,
-            //INVENTORY_ATTACH_ADDON
+            // INVENTORY_ATTACH_ADDON
             //);
+            b_show = true;
+        }
+    }
+}
+
+void CUIActorMenu::PropertiesBoxForArtefact(PIItem item, bool& b_show)
+{
+    CArtefact* pArt = smart_cast<CArtefact*>(item);
+    CArtefactContainer* pArtCont = smart_cast<CArtefactContainer*>(item);
+    CInventory* inv = &m_pActorInvOwner->inventory();
+
+    if (pArt)
+    {
+        PIItem box = inv->GetFreeArtCont(CLSID_OBJECT_ARTCONT);
+        if (box)
+        {
+            shared_str str = StringTable().translate("st_move_art_to_artcont");
+            // str.printf("%s %s", str.c_str(), box->m_name.c_str());
+            m_UIPropertiesBox->AddItem(str.c_str(), (void*)box->object_id(), INVENTORY_TO_ARTCONT_ACTION);
+            b_show = true;
+        }
+    }
+    else if (pArtCont && !pArtCont->IsEmpty())
+    {
+        TIItemContainer items_list;
+        pArtCont->AddAvailableItems(items_list);
+        TIItemContainer::iterator it = items_list.begin();
+        TIItemContainer::iterator it_e = items_list.end();
+        for (; it != it_e; ++it)
+        {
+            PIItem pItem = (*it);
+            shared_str str = StringTable().translate("st_move_art_from_artcont");
+            str.printf("%s %s", str.c_str(), pItem->m_name.c_str());
+            m_UIPropertiesBox->AddItem(str.c_str(), (void*)pItem->object_id(), INVENTORY_FROM_ARTCONT_ACTION);
             b_show = true;
         }
     }
@@ -1111,7 +1150,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
     CGameObject* GO = smart_cast<CGameObject*>(item);
     shared_str section_name = GO->cNameSect();
 
-    //ability to set eat string from settings
+    // ability to set eat string from settings
     act_str = READ_IF_EXISTS(pSettings, r_string, section_name, "default_use_text", 0);
     if (act_str)
     {
@@ -1122,7 +1161,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
     {
         CMedkit* pMedkit = smart_cast<CMedkit*>(item);
         CAntirad* pAntirad = smart_cast<CAntirad*>(item);
-        CEatableItem * pEatableItem = smart_cast<CEatableItem*>(item);
+        CEatableItem* pEatableItem = smart_cast<CEatableItem*>(item);
         CBottleItem* pBottleItem = smart_cast<CBottleItem*>(item);
 
         if (pMedkit || pAntirad)
@@ -1134,8 +1173,8 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
             // XXX: Xottab_DUTY: remove this..
             if (!xr_strcmp(section_name, "vodka") || !xr_strcmp(section_name, "energy_drink"))
                 act_str = "st_drink";
-            else if (!xr_strcmp(section_name, "bread") || !xr_strcmp(section_name, "kolbasa") || !xr_strcmp(
-                section_name, "conserva"))
+            else if (!xr_strcmp(section_name, "bread") || !xr_strcmp(section_name, "kolbasa") ||
+                !xr_strcmp(section_name, "conserva"))
                 act_str = "st_eat";
             else
                 act_str = "st_use";
@@ -1147,7 +1186,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
         }
     }
 
-    //1st Custom Use action
+    // 1st Custom Use action
     act_str = READ_IF_EXISTS(pSettings, r_string, section_name, "use1_text", 0);
     if (act_str)
     {
@@ -1155,7 +1194,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
         b_show = true;
     }
 
-    //2nd Custom Use action
+    // 2nd Custom Use action
     act_str = READ_IF_EXISTS(pSettings, r_string, section_name, "use2_text", 0);
     if (act_str)
     {
@@ -1163,7 +1202,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
         b_show = true;
     }
 
-    //3rd Custom Use action
+    // 3rd Custom Use action
     act_str = READ_IF_EXISTS(pSettings, r_string, section_name, "use3_text", 0);
     if (act_str)
     {
@@ -1171,7 +1210,7 @@ void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
         b_show = true;
     }
 
-    //4th Custom Use action
+    // 4th Custom Use action
     act_str = READ_IF_EXISTS(pSettings, r_string, section_name, "use4_text", 0);
     if (act_str)
     {
@@ -1218,7 +1257,7 @@ void CUIActorMenu::PropertiesBoxForRepair(PIItem item, bool& b_show)
     }
 }
 
-//Alundaio: Ability to donate item during trade
+// Alundaio: Ability to donate item during trade
 void CUIActorMenu::PropertiesBoxForDonate(PIItem item, bool& b_show)
 {
     m_UIPropertiesBox->AddItem("st_donate", nullptr, INVENTORY_DONATE_ACTION);
@@ -1243,6 +1282,18 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
     case INVENTORY_TO_BAG_ACTION: ToBag(cell_item, false); break;
     case INVENTORY_DONATE_ACTION: DonateCurrentItem(cell_item); break;
     case INVENTORY_EAT_ACTION: TryUseItem(cell_item); break;
+    case INVENTORY_FROM_ARTCONT_ACTION: 
+    { 
+        u16 art_id = (u16)m_UIPropertiesBox->GetClickedItem()->GetData();
+        move_item_from_to(item->object_id(), item->parent_id(), art_id);
+        break;
+    }
+    case INVENTORY_TO_ARTCONT_ACTION:
+    {
+        u16 box_id = (u16)m_UIPropertiesBox->GetClickedItem()->GetData();
+        move_item_from_to(item->parent_id(), box_id, item->object_id());
+        break;
+    }
     case INVENTORY_EAT2_ACTION:
     {
         CGameObject* GO = smart_cast<CGameObject*>(item);
@@ -1414,7 +1465,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
     }
     } // switch
 
-    //SetCurrentItem(nullptr);
+    // SetCurrentItem(nullptr);
     UpdateItemsPlace();
     UpdateConditionProgressBars();
 } // ProcessPropertiesBoxClicked
