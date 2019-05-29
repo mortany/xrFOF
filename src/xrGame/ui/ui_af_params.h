@@ -14,12 +14,14 @@ public:
     virtual ~CUIArtefactParams();
     void InitFromXml(CUIXml& xml);
     bool Check(const shared_str& af_section);
-    void SetInfo(const shared_str& af_section);
+    void SetInfo(const shared_str& af_section,float charge = 0.0f, bool can_charge = false);
 
 protected:
     UIArtefactParamItem* m_immunity_item[ALife::infl_max_count];
     UIArtefactParamItem* m_restore_item[ALife::eRestoreTypeMax];
     UIArtefactParamItem* m_additional_weight;
+    UIArtefactParamItem* m_charge_value;
+    Fvector2 pos_prop;
 
     CUIStatic* m_Prop_line;
 
@@ -35,9 +37,9 @@ public:
 
     void Init(CUIXml& xml, LPCSTR section);
     void SetCaption(LPCSTR name);
-    void SetValue(float value);
+    void SetValue(float value, bool need_sign = true);
 
-private:
+//private:
     CUIStatic* m_caption;
     CUITextWnd* m_value;
     float m_magnitude;

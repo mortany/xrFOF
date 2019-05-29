@@ -181,9 +181,9 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
     m_pUsableObject = NULL;
 
     m_anims = new SActorMotions();
-    //Alundaio: Needed for car
+    // Alundaio: Needed for car
     m_vehicle_anims = new SActorVehicleAnims();
-	//-Alundaio
+    //-Alundaio
     m_entity_condition = NULL;
     m_iLastHitterID = u16(-1);
     m_iLastHittingWeaponID = u16(-1);
@@ -227,9 +227,9 @@ CActor::~CActor()
     xr_delete(m_pPhysics_support);
 
     xr_delete(m_anims);
-	//Alundaio: For car
+    // Alundaio: For car
     xr_delete(m_vehicle_anims);
-	//-Alundaio
+    //-Alundaio
 }
 
 void CActor::reinit()
@@ -387,14 +387,14 @@ void CActor::Load(LPCSTR section)
             }
             char buf[256];
 
-            GEnv.Sound->create(
-                sndDie[0], strconcat(sizeof(buf), buf, *cName(), DELIMITER "die0"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-            GEnv.Sound->create(
-                sndDie[1], strconcat(sizeof(buf), buf, *cName(), DELIMITER "die1"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-            GEnv.Sound->create(
-                sndDie[2], strconcat(sizeof(buf), buf, *cName(), DELIMITER "die2"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-            GEnv.Sound->create(
-                sndDie[3], strconcat(sizeof(buf), buf, *cName(), DELIMITER "die3"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+            GEnv.Sound->create(sndDie[0], strconcat(sizeof(buf), buf, *cName(), DELIMITER "die0"), st_Effect,
+                SOUND_TYPE_MONSTER_DYING);
+            GEnv.Sound->create(sndDie[1], strconcat(sizeof(buf), buf, *cName(), DELIMITER "die1"), st_Effect,
+                SOUND_TYPE_MONSTER_DYING);
+            GEnv.Sound->create(sndDie[2], strconcat(sizeof(buf), buf, *cName(), DELIMITER "die2"), st_Effect,
+                SOUND_TYPE_MONSTER_DYING);
+            GEnv.Sound->create(sndDie[3], strconcat(sizeof(buf), buf, *cName(), DELIMITER "die3"), st_Effect,
+                SOUND_TYPE_MONSTER_DYING);
 
             m_HeavyBreathSnd.create(
                 pSettings->r_string(section, "heavy_breath_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
@@ -582,13 +582,8 @@ void CActor::Hit(SHit* pHDS)
         if (g_Alive())
         {
             /* AVO: send script callback*/
-            callback(GameObject::eHit)(
-                this->lua_game_object(),
-                HDS.damage(),
-                HDS.direction(),
-                smart_cast<const CGameObject*>(HDS.who)->lua_game_object(),
-                HDS.boneID
-            );
+            callback(GameObject::eHit)(this->lua_game_object(), HDS.damage(), HDS.direction(),
+                smart_cast<const CGameObject*>(HDS.who)->lua_game_object(), HDS.boneID);
         }
         inherited::Hit(&HDS);
     }
@@ -1015,7 +1010,8 @@ void CActor::UpdateCL()
 
             fire_disp_full = m_fdisp_controller.GetCurrentDispertion();
 
-            //--#SM+#-- +SecondVP+ Чтобы перекрестие не скакало из за смены FOV (Sin!) [fix for crosshair shaking while SecondVP]
+            //--#SM+#-- +SecondVP+ Чтобы перекрестие не скакало из за смены FOV (Sin!) [fix for crosshair shaking while
+            // SecondVP]
             if (!Device.m_SecondViewport.IsSVPFrame())
                 HUD().SetCrosshairDisp(fire_disp_full, 0.02f);
 
@@ -1033,14 +1029,13 @@ void CActor::UpdateCL()
             psHUD_Flags.set(HUD_CROSSHAIR_RT2, B);
 
             psHUD_Flags.set(HUD_DRAW_RT, pWeapon->show_indicators());
-            
+
             // Обновляем двойной рендер от оружия [Update SecondVP with weapon data]
-            //pWeapon->UpdateSecondVP(); //--#SM+#-- +SecondVP+
+            // pWeapon->UpdateSecondVP(); //--#SM+#-- +SecondVP+
 
             // Обновляем информацию об оружии в шейдерах
-            //g_pGamePersistent->m_pGShaderConstants->hud_params.x = pWeapon->GetZRotatingFactor(); //--#SM+#--
-            //g_pGamePersistent->m_pGShaderConstants->hud_params.y = pWeapon->GetSecondVP_FovFactor(); //--#SM+#--
-
+            // g_pGamePersistent->m_pGShaderConstants->hud_params.x = pWeapon->GetZRotatingFactor(); //--#SM+#--
+            // g_pGamePersistent->m_pGShaderConstants->hud_params.y = pWeapon->GetSecondVP_FovFactor(); //--#SM+#--
         }
     }
     else
@@ -1054,7 +1049,7 @@ void CActor::UpdateCL()
             g_pGamePersistent->m_pGShaderConstants->hud_params.set(0.f, 0.f, 0.f, 0.f); //--#SM+#--
 
             // Отключаем второй вьюпорт [Turn off SecondVP]
-            //CWeapon::UpdateSecondVP();
+            // CWeapon::UpdateSecondVP();
             Device.m_SecondViewport.SetSVPActive(false); //--#SM+#-- +SecondVP+
         }
     }
@@ -1411,19 +1406,16 @@ void CActor::renderable_Render()
 
     if ((cam_active == eacFirstEye && // first eye cam
             GEnv.Render->get_generation() == GEnv.Render->GENERATION_R2 && // R2
-            GEnv.Render->active_phase() == 1) // shadow map rendering on R2	
-        ||
-        !(IsFocused() && cam_active == eacFirstEye &&
-            (!m_holder || (m_holder && m_holder->allowWeapon() && m_holder->HUDView())))
-    )
+            GEnv.Render->active_phase() == 1) // shadow map rendering on R2
+        || !(IsFocused() && cam_active == eacFirstEye &&
+               (!m_holder || (m_holder && m_holder->allowWeapon() && m_holder->HUDView()))))
         CInventoryOwner::renderable_Render();
 
-
-    //if (1 /*!HUDview()*/)
+    // if (1 /*!HUDview()*/)
     //{
     //    CInventoryOwner::renderable_Render();
     //}
-    //VERIFY(_valid(XFORM()));
+    // VERIFY(_valid(XFORM()));
 }
 
 BOOL CActor::renderable_ShadowGenerate()
@@ -1606,14 +1598,14 @@ void CActor::ForceTransform(const Fmatrix& m)
         character_physics_support()->movement()->BlockDamageSet(u64(block_damage_time_seconds / fixed_step));
 }
 
-//ENGINE_API extern float psHUD_FOV;
+// ENGINE_API extern float psHUD_FOV;
 float CActor::Radius() const
 {
     float R = inherited::Radius();
     CWeapon* W = smart_cast<CWeapon*>(inventory().ActiveItem());
     if (W)
         R += W->Radius();
-    //if (HUDview()) R *= 1.f/psHUD_FOV;
+    // if (HUDview()) R *= 1.f/psHUD_FOV;
     return R;
 }
 
@@ -1728,7 +1720,7 @@ void CActor::UpdateArtefactsOnBeltAndOutfit()
         update_time = 0.0f;
     }
 
-    for (auto& it : inventory().m_belt)
+    for (auto& it : inventory().m_all)
     {
         const auto artefact = smart_cast<CArtefact*>(it);
         if (artefact)
@@ -1773,7 +1765,7 @@ void CActor::UpdateArtefactsOnBeltAndOutfit()
 
 float CActor::HitArtefactsOnBelt(float hit_power, ALife::EHitType hit_type)
 {
-    for (auto& it : inventory().m_belt)
+    for (auto& it : inventory().m_all)
     {
         const auto artefact = smart_cast<CArtefact*>(it);
         if (artefact)
@@ -1784,10 +1776,25 @@ float CActor::HitArtefactsOnBelt(float hit_power, ALife::EHitType hit_type)
     return hit_power;
 }
 
+void CActor::ChargeArtefacts(float hit_power, ALife::EHitType hit_type)
+{
+    for (auto& it : inventory().m_all)
+    {
+        const auto artefact = smart_cast<CArtefact*>(it);
+
+        if (artefact && artefact->m_ArtefactType == hit_type && artefact->GetCanChargeNow())
+        {
+            hit_power -= artefact->m_ArtefactHitImmunities.AffectHit(1.0f, hit_type);
+            hit_power *= artefact->GetChargingPower();
+            artefact->SetCurrentCharge(hit_power);
+        }
+    }
+}
+
 float CActor::GetProtection_ArtefactsOnBelt(ALife::EHitType hit_type)
 {
     float sum = 0.0f;
-    for (auto& it : inventory().m_belt)
+    for (auto& it : inventory().m_all)
     {
         const auto artefact = smart_cast<CArtefact*>(it);
         if (artefact)
@@ -1812,15 +1819,9 @@ void CActor::SetShotRndSeed(s32 Seed)
         m_ShotRndSeed = s32(Level().timeServer_Async());
 };
 
-Fvector CActor::GetMissileOffset() const
-{
-    return m_vMissileOffset;
-}
+Fvector CActor::GetMissileOffset() const { return m_vMissileOffset; }
 
-void CActor::SetMissileOffset(const Fvector& vNewOffset)
-{
-    m_vMissileOffset.set(vNewOffset);
-}
+void CActor::SetMissileOffset(const Fvector& vNewOffset) { m_vMissileOffset.set(vNewOffset); }
 
 void CActor::spawn_supplies()
 {

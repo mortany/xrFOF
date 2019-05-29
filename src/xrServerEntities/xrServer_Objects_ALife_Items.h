@@ -184,7 +184,7 @@ public:
     EWeaponAddonStatus m_silencer_status;
     EWeaponAddonStatus m_grenade_launcher_status;
 
-    // FFT: STCoP scopes addon
+    // Mortan: STCoP scopes addon
     u8 cur_scope;
 
     u32 timestamp;

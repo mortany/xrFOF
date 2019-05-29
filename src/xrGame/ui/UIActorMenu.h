@@ -362,7 +362,7 @@ public:
 
     IC UIHint* get_hint_wnd() { return m_hint_wnd; }
 
-    //FFTAddon
+    //Mortan:
     //void MoveToArtcont(CUICellItem* cell_item);
 
     //End

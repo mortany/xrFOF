@@ -161,6 +161,9 @@ public:
     virtual void OnMoveToBelt(const SInvItemPlace& prev){};
     virtual void OnMoveToRuck(const SInvItemPlace& prev){};
 
+    u8 GetRarity() { return m_Rarity; }
+    u32 GetRarityColor();
+
     Irect GetInvGridRect() const;
     Irect GetUpgrIconRect() const;
     const shared_str& GetIconName() const { return m_icon_name; };
@@ -190,6 +193,7 @@ protected:
     float m_weight;
     float m_fCondition;
     shared_str m_Description;
+    u8 m_Rarity;
 
 protected:
     ALife::_TIME_ID m_dwItemIndependencyTime;

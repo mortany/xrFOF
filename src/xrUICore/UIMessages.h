@@ -108,7 +108,7 @@ enum EUIMessages
     INVENTORY_ATTACH_ADDON,
     INVENTORY_REPAIR,
     
-    //FFTAddon
+    //Mortan
     INVENTORY_TO_ARTCONT_ACTION,
     INVENTORY_FROM_ARTCONT_ACTION,
     //End

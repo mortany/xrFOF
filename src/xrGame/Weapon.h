@@ -62,7 +62,7 @@ public:
     virtual void OnH_A_Independent();
     virtual void OnEvent(NET_Packet& P, u16 type); // {inherited::OnEvent(P,type);}
 
-    //FFT: STCoP scopes addon
+    //Mortan: STCoP scopes addon
     bool UseAltScope;
     void UpdateAltScope();
     bool ScopeIsHasTexture;

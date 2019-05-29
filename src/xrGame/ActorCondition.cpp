@@ -442,6 +442,10 @@ CWound* CActorCondition::ConditionHit(SHit* pHDS)
 {
     if (GodMode())
         return NULL;
+
+    //Mortan : Заряжаем артефакты все какие у нас есть в инвентаре от хита
+    Actor()->ChargeArtefacts(pHDS->damage(), pHDS->hit_type);
+
     return inherited::ConditionHit(pHDS);
 }
 

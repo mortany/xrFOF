@@ -318,7 +318,7 @@ void CActor::PickupInfoDraw(IGameObject* object)
     float y = (1.f - v_res.y) / 2.f * (Device.dwHeight);
 
     UI().Font().pFontLetterica16Russian->SetAligment(CGameFont::alCenter);
-    UI().Font().pFontLetterica16Russian->SetColor(PICKUP_INFO_COLOR);
+    UI().Font().pFontLetterica16Russian->SetColor(item->GetRarityColor());
     UI().Font().pFontLetterica16Russian->Out(x, y, draw_str);
 }
 

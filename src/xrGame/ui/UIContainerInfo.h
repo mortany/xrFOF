@@ -12,7 +12,7 @@ public:
     CUI_FFT_ItemsInfo();
     virtual ~CUI_FFT_ItemsInfo();
     void InitFromXml(CUIXml& xml);
-    void SetInfo(const shared_str& section,xr_vector<shared_str>& arts_item);
+    void SetInfo(const shared_str& section, xr_vector<shared_str> const& arts_item);
 
 protected:
     CUI_FFT_Item* m_avaible_slots[3];

@@ -25,6 +25,49 @@ public:
     virtual void OnActiveItem();
     virtual void OnHiddenItem();
 
+    //Mortan: новые параметры для зарядки артефактов
+    virtual void save(NET_Packet& output_packet);
+    virtual void load(IReader& input_packet);
+
+    shared_str m_FullChargedSection;
+    bool m_CanCharge;
+
+    float m_fChargingPower;
+    float m_fCharge;
+    float m_fChargingMax;
+    u32 m_ArtefactType;
+
+    void SetArtefactType(pcstr section);
+
+    bool SpawnNewArt();
+
+    float GetChargingMax() const { return m_fChargingMax; }
+    float GetChargingPower() const { return m_fChargingPower; }
+
+    bool GetCanChargeNow() { return m_CanCharge && !bFullyCharged; }
+
+    bool bFullyCharged;
+
+    void SetChargingMax(const float value) { m_fChargingMax = value; }
+    void SetChargingPower(const float value) { m_fChargingPower = value; }
+
+    void SetCurrentCharge(float value)
+    {
+        if (bFullyCharged)
+            return;
+
+        m_fCharge += value;
+        clamp(m_fCharge, 0.0f, GetChargingMax());
+
+        if (m_fCharge == GetChargingMax())
+        {           
+            bFullyCharged = true;
+            SpawnNewArt();
+        }
+    }
+
+    //END_ADDON
+
     virtual void UpdateCL();
     virtual void shedule_Update(u32 dt);
     void UpdateWorkload(u32 dt);

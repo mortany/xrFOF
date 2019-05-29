@@ -22,6 +22,7 @@ CUIArtefactParams::CUIArtefactParams()
         m_restore_item[i] = NULL;
     }
     m_additional_weight = NULL;
+    m_charge_value = NULL;
 }
 
 CUIArtefactParams::~CUIArtefactParams()
@@ -29,6 +30,7 @@ CUIArtefactParams::~CUIArtefactParams()
     delete_data(m_immunity_item);
     delete_data(m_restore_item);
     xr_delete(m_additional_weight);
+    xr_delete(m_charge_value);
     xr_delete(m_Prop_line);
 }
 
@@ -101,10 +103,25 @@ void CUIArtefactParams::InitFromXml(CUIXml& xml)
     CUIXmlInit::InitWindow(xml, base, 0, this);
     xml.SetLocalRoot(base_node);
 
+    //Mortan: уровень заряда артефакта
+    m_charge_value = new UIArtefactParamItem();
+    m_charge_value->Init(xml, "radiation_immunity");
+    m_charge_value->m_magnitude = 1.0f;
+    m_charge_value->m_unit_str._set("%");
+    m_charge_value->SetAutoDelete(false);
+
+    LPCSTR name = StringTable().translate("ui_inv_art_charge").c_str();
+    m_charge_value->SetCaption(name);
+
+    xml.SetLocalRoot(base_node);
+    //-------------------------------
+
     m_Prop_line = new CUIStatic();
     AttachChild(m_Prop_line);
     m_Prop_line->SetAutoDelete(false);
     CUIXmlInit::InitStatic(xml, "prop_line", 0, m_Prop_line);
+
+    pos_prop.set(m_Prop_line->GetWndPos());
 
     for (u32 i = 0; i < ALife::infl_max_count; ++i)
     {
@@ -149,10 +166,40 @@ bool CUIArtefactParams::Check(const shared_str& af_section)
     return !!pSettings->line_exist(af_section, "af_actor_properties");
 }
 
-void CUIArtefactParams::SetInfo(shared_str const& af_section)
+
+
+void CUIArtefactParams::SetInfo(shared_str const& af_section, float charge, bool can_charge)
 {
     DetachAll();
-    AttachChild(m_Prop_line);
+    float h;
+    Fvector2 pos;
+
+    if (can_charge)
+    {
+        float max_charge = pSettings->r_float(af_section, "charging_max");
+
+        float value = (charge * 100.0f) / max_charge;
+
+        m_charge_value->SetValue(iCeil(value),false);
+        AttachChild(m_charge_value);
+
+        h = m_charge_value->GetWndPos().y + m_charge_value->GetWndSize().y;
+        pos.set(m_Prop_line->GetWndPos());
+
+        pos.y = h;
+
+        m_Prop_line->SetWndPos(pos);
+
+        h += m_Prop_line->GetWndSize().y;
+
+        AttachChild(m_Prop_line);
+    }
+    else
+    {
+        m_Prop_line->SetWndPos(pos_prop);
+        AttachChild(m_Prop_line);
+        h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
+    }
 
     CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
     if (!actor)
@@ -161,8 +208,6 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
     }
 
     float val = 0.0f, max_val = 1.0f;
-    Fvector2 pos;
-    float h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
 
     for (u32 i = 0; i < ALife::infl_max_count; ++i)
     {
@@ -259,11 +304,15 @@ void UIArtefactParamItem::Init(CUIXml& xml, LPCSTR section)
 }
 
 void UIArtefactParamItem::SetCaption(LPCSTR name) { m_caption->TextItemControl()->SetText(name); }
-void UIArtefactParamItem::SetValue(float value)
+void UIArtefactParamItem::SetValue(float value, bool need_sign)
 {
     value *= m_magnitude;
     string32 buf;
-    xr_sprintf(buf, "%+.0f", value);
+
+    if (need_sign)
+        xr_sprintf(buf, "%+.0f", value);
+    else
+        xr_sprintf(buf, "% .0f", value);
 
     LPSTR str;
     if (m_unit_str.size())
@@ -274,6 +323,7 @@ void UIArtefactParamItem::SetValue(float value)
     {
         STRCONCAT(str, buf);
     }
+
     m_value->SetText(str);
 
     bool positive = (value >= 0.0f);

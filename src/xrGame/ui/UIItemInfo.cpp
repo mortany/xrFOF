@@ -206,6 +206,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
     string256 str;
     if (UIName)
     {
+        UIName->SetTextColor(pInvItem->GetRarityColor());
         UIName->SetText(pInvItem->NameItem());
         UIName->AdjustHeightToText();
         pos.y = UIName->GetWndPos().y + UIName->GetHeight() + 4.0f;
@@ -303,7 +304,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
         }
         TryAddConditionInfo(*pInvItem, pCompareItem);
         TryAddWpnInfo(*pInvItem, pCompareItem);
-        TryAddArtefactInfo(pInvItem->object().cNameSect());
+        TryAddArtefactInfo(pInvItem->object().cNameSect(), *pInvItem);
         TryAddOutfitInfo(*pInvItem, pCompareItem);
         TryAddUpgradeInfo(*pInvItem);
         TryAddBoosterInfo(*pInvItem);
@@ -368,12 +369,22 @@ void CUIItemInfo::TryAddWpnInfo(CInventoryItem& pInvItem, CInventoryItem* pCompa
     }
 }
 
-void CUIItemInfo::TryAddArtefactInfo(const shared_str& af_section)
+void CUIItemInfo::TryAddArtefactInfo(const shared_str& af_section, CInventoryItem& pInvItem)
 {
-    if (UIArtefactParams->Check(af_section))
+    CArtefact* art = smart_cast<CArtefact*>(&pInvItem);
+
+    if (art && art->m_CanCharge)
     {
-        UIArtefactParams->SetInfo(af_section);
+        UIArtefactParams->SetInfo(af_section, art->m_fCharge, art->m_CanCharge);
         UIDesc->AddWindow(UIArtefactParams, false);
+    }
+    else
+    {
+        if (UIArtefactParams->Check(af_section))
+        {
+            UIArtefactParams->SetInfo(af_section);
+            UIDesc->AddWindow(UIArtefactParams, false);
+        }
     }
 }
 
@@ -412,6 +423,7 @@ void CUIItemInfo::TryAddFFTInfo(CInventoryItem& pInvItem)
         UI_fft_Info->SetInfo(pInvItem.object().cNameSect(), box->m_items_name);
         UIDesc->AddWindow(UI_fft_Info, false);
     }
+
 }
 
 void CUIItemInfo::TryAddBoosterInfo(CInventoryItem& pInvItem)

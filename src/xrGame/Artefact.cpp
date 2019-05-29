@@ -51,6 +51,10 @@ CArtefact::CArtefact()
     m_activationObj = NULL;
     m_detectorObj = NULL;
     m_additional_weight = 0.0f;
+    m_CanCharge = false;
+    m_FullChargedSection = nullptr;
+    m_fCharge = 0.0f;
+    bFullyCharged = false;
 }
 
 CArtefact::~CArtefact() {}
@@ -75,6 +79,16 @@ void CArtefact::Load(LPCSTR section)
     m_fPowerRestoreSpeed = pSettings->r_float(section, "power_restore_speed");
     m_fBleedingRestoreSpeed = pSettings->r_float(section, "bleeding_restore_speed");
 
+    m_fChargingMax = READ_IF_EXISTS(pSettings, r_float, section, "charging_max", 0.0f);
+
+    m_fChargingPower = READ_IF_EXISTS(pSettings, r_float, section, "charging_power_speed", 0.0f);
+
+    m_CanCharge = (m_fChargingMax > 0.0f && m_fChargingPower > 0.0f);
+
+    m_FullChargedSection = READ_IF_EXISTS(pSettings, r_string, section, "after_charge", nullptr);
+
+    SetArtefactType(section);
+
     if (pSettings->section_exist(pSettings->r_string(section, "hit_absorbation_sect")))
     {
         m_ArtefactHitImmunities.LoadImmunities(pSettings->r_string(section, "hit_absorbation_sect"), pSettings);
@@ -82,6 +96,43 @@ void CArtefact::Load(LPCSTR section)
     m_bCanSpawnZone = !!pSettings->line_exist("artefact_spawn_zones", section);
     m_af_rank = pSettings->r_u8(section, "af_rank");
     m_additional_weight = pSettings->r_float(section, "additional_inventory_weight");
+}
+
+bool CArtefact::SpawnNewArt()
+{ 
+    if (m_FullChargedSection.size())
+    {
+        Level().spawn_item(m_FullChargedSection.c_str(), Actor()->Position(), false, Actor()->ID());
+        DestroyObject();
+        return true;
+    }
+    return false;
+}
+
+void CArtefact::SetArtefactType(pcstr section)
+{
+    int tmp = READ_IF_EXISTS(pSettings, r_u32, section, "energy_type", 0);
+    clamp(tmp, 0, 4);
+
+    switch (tmp)
+    {
+        case 1: m_ArtefactType = ALife::eHitTypeLightBurn; break; // Термический
+        case 2: m_ArtefactType = ALife::eHitTypeChemicalBurn; break; // Химический
+        case 3: m_ArtefactType = ALife::eHitTypeShock; break; // Электрический
+        case 4: m_ArtefactType = ALife::eHitTypeStrike; break; // Физический
+        case 0: m_ArtefactType = ALife::eHitTypeMax; break;
+        default: break;
+    }
+
+}
+
+void CArtefact::save(NET_Packet& output_packet) 
+{ 
+    inherited::save(output_packet); 
+}
+void CArtefact::load(IReader& input_packet)
+{ 
+    inherited::load(input_packet); 
 }
 
 BOOL CArtefact::net_Spawn(CSE_Abstract* DC)

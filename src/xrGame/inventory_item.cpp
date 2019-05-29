@@ -56,6 +56,8 @@ CInventoryItem::CInventoryItem()
     m_flags.set(FUsingCondition, FALSE);
     m_fCondition = 1.0f;
 
+    m_Rarity = 0;
+
     m_name = m_nameShort = NULL;
 
     m_ItemCurrPlace.value = 0;
@@ -88,6 +90,7 @@ CInventoryItem::~CInventoryItem()
 #endif // #ifndef MASTER_GOLD
 }
 
+
 void CInventoryItem::Load(LPCSTR section)
 {
     CHitImmunity::LoadImmunities(pSettings->r_string(section, "immunities_sect"), pSettings);
@@ -99,6 +102,7 @@ void CInventoryItem::Load(LPCSTR section)
     m_section_id._set(section);
     m_name = StringTable().translate(pSettings->r_string(section, INV_NAME_KEY));
     m_nameShort = StringTable().translate(pSettings->r_string(section, INV_NAME_SHORT_KEY));
+    m_Rarity = READ_IF_EXISTS(pSettings, r_u8, section, "rarity", 0);
 
     m_weight = pSettings->r_float(section, "inv_weight");
     R_ASSERT(m_weight >= 0.f);
@@ -125,6 +129,27 @@ void CInventoryItem::Load(LPCSTR section)
         m_fControlInertionFactor = pSettings->r_float(section, "control_inertion_factor");
     }
     m_icon_name = READ_IF_EXISTS(pSettings, r_string, section, "icon_name", NULL);
+}
+
+u32 CInventoryItem::GetRarityColor() 
+{ 
+    u32 color = COMMON;
+    switch (m_Rarity)
+    {
+        case 0: color = COMMON; break;
+
+        case 1: color = UNCOMMON; break;
+
+        case 2: color = RARE; break;
+
+        case 3: color = UNIQUE; break;
+
+        case 4: color = ULTRA_RARE; break;
+
+        default: break;
+    }
+
+    return color;
 }
 
 void CInventoryItem::ReloadNames()

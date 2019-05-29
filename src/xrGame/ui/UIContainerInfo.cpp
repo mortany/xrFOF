@@ -46,7 +46,7 @@ void CUI_FFT_ItemsInfo::InitFromXml(CUIXml& xml)
     xml.SetLocalRoot(stored_root);
 }
 
-void CUI_FFT_ItemsInfo::SetInfo(shared_str const& section, xr_vector<shared_str> &arts_item)
+void CUI_FFT_ItemsInfo::SetInfo(shared_str const& section, xr_vector<shared_str> const& arts_item)
 {
     DetachAll();
     AttachChild(m_Prop_line);
@@ -63,24 +63,24 @@ void CUI_FFT_ItemsInfo::SetInfo(shared_str const& section, xr_vector<shared_str>
         {
             size = it - arts_item.begin();
             shared_str art_name = StringTable().translate(pSettings->r_string((*it).c_str(), "inv_name"));
-            u8 lvl = READ_IF_EXISTS(pSettings, r_u8, (*it).c_str(), "level_item", 0);
-            u32 color = color_rgba(170, 170, 170, 255);
+            u8 lvl = READ_IF_EXISTS(pSettings, r_u8, (*it).c_str(), "rarity", 0);
+            u32 color = COMMON;
             switch (lvl)
             {
-                case 1: color = color_rgba(187, 255, 255, 255); break;
+                case 0: color = COMMON; break;
+
+                case 1: color = UNCOMMON; break;
                 
-                case 2: color = color_rgba(118, 238, 198, 255); break;
+                case 2: color = RARE; break;
                 
-                case 3: color = color_rgba(0, 205, 102, 255); break;
+                case 3: color = UNIQUE; break;
                 
-                case 4: color = color_rgba(145, 44, 238, 255); break;
-                
-                case 5: color = color_rgba(180, 40, 35, 255); break;
-                
-                case 0: break;
+                case 4: color = ULTRA_RARE; break;               
 
                 default: break;
             }
+
+
             m_avaible_slots[size]->get_caption()->SetTextColor(color);
             m_avaible_slots[size]->SetValue(art_name.c_str());
             pos.set(m_avaible_slots[size]->GetWndPos());
