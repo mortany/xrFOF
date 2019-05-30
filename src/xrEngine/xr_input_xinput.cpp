@@ -114,6 +114,7 @@ _action actions[] = {
     { "pda_tab6",          kPDA_TAB6,          _sp },
 
     { "kick",              kKICK,              _sp },
+	{ "prone",             kPRONE,             _sp },
 
     { nullptr,             kLASTACTION,        _both }
 };

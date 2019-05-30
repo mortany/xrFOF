@@ -111,6 +111,7 @@ enum EGameActions
     kPDA_TAB6,
 
     kKICK, // alpet: kick dynamic objects
+	kPRONE,
 
     kLASTACTION,
     kNOTBINDED,

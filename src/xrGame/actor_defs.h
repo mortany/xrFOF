@@ -44,6 +44,7 @@ enum EMoveCommand
     mcSprint = (1ul << 12ul),
     mcLLookout = (1ul << 13ul),
     mcRLookout = (1ul << 14ul),
+    mcProne = (1ul << 15ul),
     mcAnyMove = (mcFwd | mcBack | mcLStrafe | mcRStrafe),
     mcAnyAction = (mcAnyMove | mcJump | mcFall | mcLanding | mcLanding2), // mcTurn|
     mcAnyState = (mcCrouch | mcAccel | mcClimb | mcSprint),

@@ -341,6 +341,8 @@ void CActor::Load(LPCSTR section)
             rtMonsterMedium, pSettings->r_float(section, "medium_monster_restrictor_radius"));
     character_physics_support()->movement()->Load(section);
 
+
+    set_box(section, *character_physics_support()->movement(), 3);
     set_box(section, *character_physics_support()->movement(), 2);
     set_box(section, *character_physics_support()->movement(), 1);
     set_box(section, *character_physics_support()->movement(), 0);

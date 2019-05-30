@@ -327,7 +327,7 @@ void CActor::g_SetAnimation(u32 mstate_rl)
         if (m_current_legs || m_current_torso)
         {
             SActorState* ST = 0;
-            if (mstate_rl & mcCrouch)
+            if (mstate_rl & mcCrouch || mstate_rl & mcProne)
                 ST = &m_anims->m_crouch;
             else
                 ST = &m_anims->m_normal;
@@ -344,7 +344,7 @@ void CActor::g_SetAnimation(u32 mstate_rl)
     SActorState* ST = 0;
     SAnimState* AS = 0;
 
-    if (mstate_rl & mcCrouch)
+    if (mstate_rl & mcCrouch || mstate_rl & mcProne)
         ST = &m_anims->m_crouch;
     else if (mstate_rl & mcClimb)
         ST = &m_anims->m_climb;
@@ -565,7 +565,7 @@ void CActor::g_SetAnimation(u32 mstate_rl)
 
     if (!M_legs)
     {
-        if ((mstate_rl & mcCrouch) && !isActorAccelerated(mstate_rl, IsZoomAimingMode())) //!(mstate_rl&mcAccel))
+        if ((mstate_rl & mcCrouch || mstate_rl & mcProne) && !isActorAccelerated(mstate_rl, IsZoomAimingMode())) //!(mstate_rl&mcAccel))
         {
             M_legs = smart_cast<IKinematicsAnimated*>(Visual())->ID_Cycle("cr_idle_1");
         }

@@ -126,16 +126,39 @@ void CActor::g_cl_ValidateMState(float dt, u32 mstate_wf)
         mstate_real &= ~mcClimb;
     };
 
-    if (mstate_wf != mstate_real)
+	if (mstate_wf != mstate_real)
     {
         if ((mstate_real & mcCrouch) && ((0 == (mstate_wf & mcCrouch)) || mstate_real & mcClimb))
         {
-            if (character_physics_support()->movement()->ActivateBoxDynamic(0))
+            if (mstate_wf & mcProne)
             {
                 mstate_real &= ~mcCrouch;
             }
+            else
+            {
+                if (character_physics_support()->movement()->ActivateBoxDynamic(0))
+                {
+                    mstate_real &= ~mcCrouch;
+                }
+            }
+        }
+        else if ((mstate_real & mcProne) && ((0 == (mstate_wf & mcProne)) || mstate_real & mcClimb))
+        {
+            if (mstate_wf & mcCrouch)
+            {
+                mstate_real &= ~mcProne;
+            }
+            else
+            {
+                if (character_physics_support()->movement()->ActivateBoxDynamic(0))
+                {
+                    mstate_real &= ~mcProne;
+                }
+            }
         }
     }
+
+
 
     if (!CanAccelerate() && isActorAccelerated(mstate_real, IsZoomAimingMode()))
     {
@@ -191,6 +214,19 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
     if (mstate_wf & mcRStrafe)
         vControlAccel.x += 1;
 
+	// Dirty hack, remove later
+    if ((mstate_real & mcCrouch) && (mstate_wf & mcCrouch) && (mstate_wf & mcProne))
+    {
+        mstate_wf &= ~mcCrouch;
+        mstate_wishful &= ~mcCrouch;
+    }
+    else if ((mstate_real & mcProne) && (mstate_wf & mcCrouch) && (mstate_wf & mcProne))
+    {
+        mstate_wf &= ~mcProne;
+        mstate_wishful &= ~mcProne;
+    }
+    // end-hack
+
     CPHMovementControl::EEnvironment curr_env = character_physics_support()->movement()->Environment();
     if (curr_env == CPHMovementControl::peOnGround || curr_env == CPHMovementControl::peAtWall)
     {
@@ -214,6 +250,20 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                     mstate_real |= mcCrouch;
             }
         }
+        else if ((0 == (mstate_real & mcProne)) && (mstate_wf & mcProne))
+        {
+            if (mstate_real & mcClimb)
+            {
+                mstate_wf &= ~mcProne;
+            }
+            else
+            {
+                character_physics_support()->movement()->EnableCharacter();
+                if (character_physics_support()->movement()->ActivateBoxDynamic(3))
+                    mstate_real |= mcProne;
+            }
+        }
+
         // jump
         m_fJumpTime -= dt;
 
@@ -261,7 +311,7 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
             mstate_real |= mcSprint;
         else
             mstate_real &= ~mcSprint;
-        if (!(mstate_real & (mcFwd | mcLStrafe | mcRStrafe)) || mstate_real & (mcCrouch | mcClimb) ||
+        if (!(mstate_real & (mcFwd | mcLStrafe | mcRStrafe)) || mstate_real & (mcCrouch | mcClimb | mcProne) ||
             !isActorAccelerated(mstate_wf, IsZoomAimingMode()))
         {
             mstate_real &= ~mcSprint;
@@ -292,14 +342,14 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                 else if (mstate_real & mcBack)
                     scale *= m_fWalkBackFactor;
 
-                if (mstate_real & mcCrouch)
+                if (mstate_real & mcCrouch || mstate_real & mcProne)
                     scale *= m_fCrouchFactor;
                 if (mstate_real & mcClimb)
                     scale *= m_fClimbFactor;
                 if (mstate_real & mcSprint)
                     scale *= m_fSprintFactor;
 
-                if (mstate_real & (mcLStrafe | mcRStrafe) && !(mstate_real & mcCrouch))
+                if (mstate_real & (mcLStrafe | mcRStrafe) && !(mstate_real & mcCrouch | mcProne))
                 {
                     if (bAccelerated)
                         scale *= m_fRun_StrafeFactor;
