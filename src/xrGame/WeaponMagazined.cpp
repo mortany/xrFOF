@@ -93,7 +93,7 @@ void CWeaponMagazined::Load(LPCSTR section)
 
     m_sounds.LoadSound(section, "snd_empty", "sndEmptyClick", false, m_eSoundEmptyClick);
     m_sounds.LoadSound(section, "snd_reload", "sndReload", true, m_eSoundReload);
-
+    //Mortan: воу, тут уже были нужные звуки.
     if (WeaponSoundExist(section, "snd_reload_empty"))
         m_sounds.LoadSound(section, "snd_reload_empty", "sndReloadEmpty", true, m_eSoundReloadEmpty);
     if (WeaponSoundExist(section, "snd_reload_misfire"))
@@ -159,6 +159,8 @@ void CWeaponMagazined::FireStart()
                 if (GetState() == eHiding)
                     return;
                 if (GetState() == eMisfire)
+                    return;
+                if (GetState() == eUnmis) // Mortan: доп запрет
                     return;
 
                 inherited::FireStart();
@@ -226,7 +228,7 @@ bool CWeaponMagazined::TryReload()
         if (IsMisfire() && iAmmoElapsed)
         {
             SetPending(true);
-            SwitchState(eReload);
+            SwitchState(eUnmis);
             return true;
         }
 
@@ -383,17 +385,23 @@ void CWeaponMagazined::ReloadMagazine()
     if (!m_pCurrentAmmo && !unlimited_ammo())
         return;
 
+    int iMagSizeCurrent = (iAmmoElapsed == 0) ? iMagazineSize : iMagazineSize + 1;
+
     //разрядить магазин, если загружаем патронами другого типа
-    if (!m_bLockType && !m_magazine.empty() &&
+    if (!m_bLockType && !m_magazine.empty() && 
         (!m_pCurrentAmmo || xr_strcmp(m_pCurrentAmmo->cNameSect(), *m_magazine.back().m_ammoSect)))
+    {
         UnloadMagazine();
+        iMagSizeCurrent = iMagazineSize;
+
+    }
 
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
 
     if (m_DefaultCartridge.m_LocalAmmoType != m_ammoType)
         m_DefaultCartridge.Load(m_ammoTypes[m_ammoType].c_str(), m_ammoType);
     CCartridge l_cartridge = m_DefaultCartridge;
-    while (iAmmoElapsed < iMagazineSize)
+    while (iAmmoElapsed < iMagSizeCurrent)
     {
         if (!unlimited_ammo())
         {
@@ -411,7 +419,7 @@ void CWeaponMagazined::ReloadMagazine()
     if (m_pCurrentAmmo && !m_pCurrentAmmo->m_boxCurr && OnServer())
         m_pCurrentAmmo->SetDropManual(true);
 
-    if (iMagazineSize > iAmmoElapsed)
+    if (iMagSizeCurrent > iAmmoElapsed)
     {
         m_bLockType = true;
         ReloadMagazine();
@@ -429,6 +437,7 @@ void CWeaponMagazined::OnStateSwitch(u32 S, u32 oldState)
     {
     case eIdle: switch2_Idle(); break;
     case eFire: switch2_Fire(); break;
+    case eUnmis: switch2_Unmis(); break;
     case eMisfire:
         if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
             CurrentGameUI()->AddCustomStatic("gun_jammed", true);
@@ -656,6 +665,11 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
         SwitchState(eIdle);
         break; // End of reload animation
     case eHiding: SwitchState(eHidden); break; // End of Hide
+    case eUnmis:
+        bMisfire = false;
+        --iAmmoElapsed;
+        SwitchState(eIdle);
+        break;
     case eShowing: SwitchState(eIdle); break; // End of Show
     case eIdle: switch2_Idle(); break; // Keep showing idle
     }
@@ -739,25 +753,42 @@ void CWeaponMagazined::PlayReloadSound()
 {
     if (m_sounds_enabled)
     {
-        if (bMisfire)
-        {
-            // TODO: make sure correct sound is loaded in CWeaponMagazined::Load(LPCSTR section)
-            if (m_sounds.FindSoundItem("sndReloadMisfire", false))
-                PlaySound("sndReloadMisfire", get_LastFP());
+        if (iAmmoElapsed == 0)
+            if (m_sounds.FindSoundItem("sndReloadEmpty", false))
+                PlaySound("sndReloadEmpty", get_LastFP());
             else
                 PlaySound("sndReload", get_LastFP());
-        }
         else
-        {
-            if (iAmmoElapsed == 0)
-                if (m_sounds.FindSoundItem("sndReloadEmpty", false))
-                    PlaySound("sndReloadEmpty", get_LastFP());
-                else
-                    PlaySound("sndReload", get_LastFP());
-            else
-                PlaySound("sndReload", get_LastFP());
-        }
+            PlaySound("sndReload", get_LastFP());
     }
+}
+
+
+void CWeaponMagazined::PlayAnimUnmis()
+{ 
+    auto state = GetState();
+    VERIFY(state == eUnmis);
+
+    if (isHUDAnimationExist("anm_reload_misfire"))
+        PlayHUDMotion("anm_reload_misfire", true, this, state);
+    else
+        PlayHUDMotion("anm_reload", true, this, state);
+}
+
+void CWeaponMagazined::PlaySoundUnmis() 
+{
+    if (m_sounds_enabled)
+    {
+        // TODO: make sure correct sound is loaded in CWeaponMagazined::Load(LPCSTR section)
+        if (m_sounds.FindSoundItem("sndReloadMisfire", false))
+            PlaySound("sndReloadMisfire", get_LastFP());
+    }
+}
+
+void CWeaponMagazined::switch2_Unmis()
+{
+    PlayAnimUnmis();
+    PlaySoundUnmis();
 }
 
 void CWeaponMagazined::switch2_Reload()
@@ -798,6 +829,8 @@ void CWeaponMagazined::switch2_Showing()
     PlayAnimShow();
 }
 
+#include "CustomDetector.h"
+
 bool CWeaponMagazined::Action(u16 cmd, u32 flags)
 {
     if (inherited::Action(cmd, flags))
@@ -813,7 +846,21 @@ bool CWeaponMagazined::Action(u16 cmd, u32 flags)
     {
         if (flags & CMD_START)
             if (iAmmoElapsed < iMagazineSize || IsMisfire())
-                Reload();
+            {
+                if (GetState() == eUnmis) //Rietmon: Запрещаем перезарядку, если играет анима передергивания затвора
+                    return false;
+
+                PIItem Det = Actor()->inventory().ItemFromSlot(DETECTOR_SLOT);
+                if (!Det)
+                    Reload(); // Rietmon: Если в слоте нету детектора, то он не может быть активен
+
+                if (Det)
+                {
+                    CCustomDetector* pDet = smart_cast<CCustomDetector*>(Det);
+                    if (!pDet->IsWorking())
+                        Reload();
+                }
+            }
     }
         return true;
     case kWPN_FIREMODE_PREV:
