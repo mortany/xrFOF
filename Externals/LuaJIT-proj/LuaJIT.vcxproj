@@ -48,6 +48,10 @@
   <ItemDefinitionGroup>
     <Link>
       <AdditionalDependencies>lj_vm_$(PlatformShortName).obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <BaseAddress Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </BaseAddress>
+      <RandomizedBaseAddress Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RandomizedBaseAddress>
+      <FixedBaseAddress Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</FixedBaseAddress>
     </Link>
     <ClCompile>
       <PreprocessorDefinitions>LUA_BUILD_AS_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
