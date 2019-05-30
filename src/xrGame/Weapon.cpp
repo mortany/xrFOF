@@ -1054,7 +1054,39 @@ void CWeapon::EnableActorNVisnAfterZoom()
     }
 }
 
-bool CWeapon::need_renderable() { return !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom()); }
+// Получить FOV от текущего оружия игрока для второго рендера
+float CWeapon::GetSecondVPFov() const
+{
+    if (m_zoom_params.m_bUseDynamicZoom && IsSecondVPZoomPresent())
+        return (m_fRTZoomFactor / 100.f) * g_fov;
+
+    return GetSecondVPZoomFactor() * g_fov;
+}
+
+// Обновление необходимости включения второго вьюпорта +SecondVP+
+// Вызывается только для активного оружия игрока
+void CWeapon::UpdateSecondVP()
+{
+    // + CActor::UpdateCL();
+    bool b_is_active_item = (m_pInventory != NULL) && (m_pInventory->ActiveItem() == this);
+    R_ASSERT(
+        ParentIsActor() && b_is_active_item); // Эта функция должна вызываться только для оружия в руках нашего игрока
+
+    CActor* pActor = H_Parent()->cast_actor();
+
+    bool bCond_1 = m_zoom_params.m_fZoomRotationFactor > 0.05f; // Мы должны целиться
+    bool bCond_2 = IsSecondVPZoomPresent(); // В конфиге должен быть прописан фактор зума для линзы (scope_lense_factor
+                                            // больше чем 0)
+    bool bCond_3 = pActor->cam_Active() == pActor->cam_FirstEye(); // Мы должны быть от 1-го лица
+
+    Device.m_SecondViewport.SetSVPActive(bCond_1 && bCond_2 && bCond_3);
+}
+
+bool CWeapon::need_renderable()
+{
+    return !Device.m_SecondViewport.IsSVPFrame() && !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom());
+}
+
 void CWeapon::renderable_Render()
 {
     UpdateXForm();

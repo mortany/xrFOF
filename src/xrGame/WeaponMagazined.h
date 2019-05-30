@@ -39,6 +39,9 @@ protected:
 protected:
     virtual void OnMagazineEmpty();
 
+    //Mortan: какая-то нелепость - для устранения осечки нет отдельного стейта, непорядок
+    virtual void switch2_Unmis(); // исправил это недоразумение
+
     virtual void switch2_Idle();
     virtual void switch2_Fire();
     virtual void switch2_Empty();
@@ -170,6 +173,10 @@ protected:
     virtual void PlayAnimShoot();
     virtual void PlayReloadSound();
     virtual void PlayAnimAim();
+
+    //Mortan: проигрывание анимаций и звуков для новых стейтов
+    virtual void PlayAnimUnmis();
+    virtual void PlaySoundUnmis();
 
     virtual int ShotsFired() { return m_iShotNum; }
     virtual float GetWeaponDeterioration();

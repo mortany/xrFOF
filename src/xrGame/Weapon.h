@@ -62,7 +62,7 @@ public:
     virtual void OnH_A_Independent();
     virtual void OnEvent(NET_Packet& P, u16 type); // {inherited::OnEvent(P,type);}
 
-    //Mortan: STCoP scopes addon
+    //Mortan: оружейные правки, из шокера и мои
     bool UseAltScope;
     void UpdateAltScope();
     bool ScopeIsHasTexture;
@@ -75,6 +75,16 @@ public:
     bool LoadScopeTexture(LPCSTR section);
     bool bScopeIsLoaded;
 
+    //Второй рендер
+    float CWeapon::GetSecondVPFov() const;
+    IC float GetZRotatingFactor()    const { return m_zoom_params.m_fZoomRotationFactor; }
+    IC float GetSecondVPZoomFactor() const { return m_zoom_params.m_fSecondVPFovFactor; }
+    IC float IsSecondVPZoomPresent() const { return GetSecondVPZoomFactor() > 0.000f; }
+
+    void UpdateSecondVP();
+
+    //Отвечают за коллизию
+    //TODO: переработать коллизию
     float m_hud_fov_add_mod;
     float m_nearwall_dist_max;
     float m_nearwall_dist_min;
@@ -126,6 +136,7 @@ public:
         eMisfire,
         eMagEmpty,
         eSwitch,
+        eUnmis,
     };
     enum EWeaponSubStates
     {
@@ -213,26 +224,28 @@ protected:
 protected:
     struct SZoomParams
     {
-        bool m_bZoomEnabled; //разрешение режима приближения
-        bool m_bHideCrosshairInZoom;
-        bool m_bZoomDofEnabled;
-
-        bool m_bIsZoomModeNow; //когда режим приближения включен
-        float m_fCurrentZoomFactor; //текущий фактор приближения
-        float m_fZoomRotateTime; //время приближения
-
-        float m_fIronSightZoomFactor; //коэффициент увеличения прицеливания
-        float m_fScopeZoomFactor; //коэффициент увеличения прицела
-
+        bool m_bZoomEnabled;          // разрешение режима приближения
+        bool m_bHideCrosshairInZoom; 
+        bool m_bZoomDofEnabled;       // DOF-эффект во время зума
+        bool m_bIsZoomModeNow;        // когда режим приближения включен
+        
+        float m_fCurrentZoomFactor;   // текущий фактор приближения
+        float m_fZoomRotateTime;      // время приближения
+        //float m_fRTZoomFactor;        // Последний сохранённый FOV для зума с регулируемой кратностью
+        float m_fIronSightZoomFactor; // коэффициент увеличения прицеливания
+        float m_fScopeZoomFactor;     // коэффициент увеличения прицела
+        float m_fSecondVPFovFactor;   // Модификатор для FOV во втором вьюпорте при зуме
         float m_fZoomRotationFactor;
 
-        Fvector m_ZoomDof;
-        Fvector4 m_ReloadDof;
-        Fvector4 m_ReloadEmptyDof;
-        bool m_bUseDynamicZoom;
-        shared_str m_sUseZoomPostprocess;
-        shared_str m_sUseBinocularVision;
-        CBinocularsVision* m_pVision;
+        
+
+        Fvector               m_ZoomDof;              // Параметры DOF-эффекта при прицеливании
+        Fvector4              m_ReloadDof;            // Параметры DOF-эффекта при перезарядке
+        Fvector4              m_ReloadEmptyDof;       // ??
+        bool                  m_bUseDynamicZoom;      // Прицел с регулируемой кратностью
+        shared_str            m_sUseZoomPostprocess;  // Пост-эффект прицела
+        shared_str            m_sUseBinocularVision;  // Эффект выделения в прицеле живых существ
+        CBinocularsVision*    m_pVision;
         CNightVisionEffector* m_pNight_vision;
 
     } m_zoom_params;
