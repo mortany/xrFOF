@@ -1099,8 +1099,14 @@ void CActor::set_state_box(u32 mstate)
         else
             character_physics_support()->movement()->ActivateBox(2, true);
     }
+    else if (mstate & mcProne)
+    {
+        character_physics_support()->movement()->ActivateBox(3, true);
+    }
     else
+    {
         character_physics_support()->movement()->ActivateBox(0, true);
+    }
 }
 void CActor::shedule_Update(u32 DT)
 {
@@ -1887,7 +1893,7 @@ IFactoryObject* CActor::_construct()
     return (this);
 }
 
-bool CActor::use_center_to_aim() const { return (!!(mstate_real & mcCrouch)); }
+bool CActor::use_center_to_aim() const { return (!!(mstate_real & mcCrouch) || !!(mstate_real & mcProne)); }
 bool CActor::can_attach(const CInventoryItem* inventory_item) const
 {
     const CAttachableItem* item = smart_cast<const CAttachableItem*>(inventory_item);
