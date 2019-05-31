@@ -1216,6 +1216,7 @@ void CActor::shedule_Update(u32 DT)
             mstate_wishful &= ~mcBack;
             if (!psActorFlags.test(AF_CROUCH_TOGGLE))
                 mstate_wishful &= ~mcCrouch;
+				mstate_wishful &= ~mcProne;
         }
     }
     else
