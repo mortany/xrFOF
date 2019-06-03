@@ -75,6 +75,10 @@ void CShootingObject::Load(LPCSTR section)
         cycleDown = false;
     //Alundaio: END
 
+
+	// Mortan: бёрст как в пабге - по кнопке сразу всю очередь
+    bPUBGBurst = READ_IF_EXISTS(pSettings, r_bool, section, "pubg_burst", false);
+
     LoadFireParams(section);
     LoadLights(section, "");
     LoadShellParticles(section, "");

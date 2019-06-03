@@ -54,6 +54,7 @@ CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon()
     m_iShotNum = 0;
     m_fOldBulletSpeed = 0;
     m_iQueueSize = WEAPON_ININITE_QUEUE;
+    m_iNeedShotNum = 0;
     m_bLockType = false;
 }
 
@@ -93,7 +94,7 @@ void CWeaponMagazined::Load(LPCSTR section)
 
     m_sounds.LoadSound(section, "snd_empty", "sndEmptyClick", false, m_eSoundEmptyClick);
     m_sounds.LoadSound(section, "snd_reload", "sndReload", true, m_eSoundReload);
-    //Mortan: воу, тут уже были нужные звуки.
+    // Mortan: воу, тут уже были нужные звуки.
     if (WeaponSoundExist(section, "snd_reload_empty"))
         m_sounds.LoadSound(section, "snd_reload_empty", "sndReloadEmpty", true, m_eSoundReloadEmpty);
     if (WeaponSoundExist(section, "snd_reload_misfire"))
@@ -388,12 +389,11 @@ void CWeaponMagazined::ReloadMagazine()
     int iMagSizeCurrent = (iAmmoElapsed == 0) ? iMagazineSize : iMagazineSize + 1;
 
     //разрядить магазин, если загружаем патронами другого типа
-    if (!m_bLockType && !m_magazine.empty() && 
+    if (!m_bLockType && !m_magazine.empty() &&
         (!m_pCurrentAmmo || xr_strcmp(m_pCurrentAmmo->cNameSect(), *m_magazine.back().m_ammoSect)))
     {
         UnloadMagazine();
         iMagSizeCurrent = iMagazineSize;
-
     }
 
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
@@ -431,6 +431,18 @@ void CWeaponMagazined::ReloadMagazine()
 
 void CWeaponMagazined::OnStateSwitch(u32 S, u32 oldState)
 {
+    // Mortan: хак для режимов отсечки по два\три патрона, предназначен для
+    // симуляции нажатия на спусковой крючок несколько раз, чисто игровая механика
+    // в реальности оно работает не так.
+
+    /*if (m_iNeedShotNum > 0)
+    {
+        if (oldState == eFire && S == eIdle)
+        {
+            FireStart();
+        }
+    }*/
+
     inherited::OnStateSwitch(S, oldState);
     CInventoryOwner* owner = smart_cast<CInventoryOwner*>(this->H_Parent());
     switch (S)
@@ -547,7 +559,7 @@ void CWeaponMagazined::state_Fire(float dt)
         CEntity* E = smart_cast<CEntity*>(H_Parent());
         E->g_fireParams(this, p1, d);
 
-        if (!E->g_stateFire())
+        if (!E->g_stateFire() && m_iNeedShotNum == 0)
             StopShooting();
 
         if (m_iShotNum == 0)
@@ -556,28 +568,52 @@ void CWeaponMagazined::state_Fire(float dt)
             m_vStartDir = d;
         };
 
+        if (m_magazine.empty())
+        {
+            StopShooting();
+            m_iNeedShotNum = 0;
+            return;
+        }
+
+        if (m_iShotNum == 0 && (m_iQueueSize == 3 || m_iQueueSize == 2) && m_iNeedShotNum == 0 && bPUBGBurst)
+        {
+            m_iNeedShotNum = m_iQueueSize;
+        }
+
         VERIFY(!m_magazine.empty());
 
         while (!m_magazine.empty() && fShotTimeCounter < 0 && (IsWorking() || m_bFireSingleShot) &&
-            (m_iQueueSize < 0 || m_iShotNum < m_iQueueSize))
+            (m_iQueueSize < 0 || m_iShotNum < m_iQueueSize || m_iNeedShotNum!=0))
         {
             if (CheckForMisfire())
             {
                 StopShooting();
+                m_iNeedShotNum = 0;
                 return;
             }
 
             m_bFireSingleShot = false;
 
+
+			// Mortan: хак для того чтобы считать сколько выстрелов еще нужно сделать
+			// и сколько уже сделали.
+            
+
             // Alundaio: Use fModeShotTime instead of fOneShotTime if current fire mode is 2-shot burst
             // Alundaio: Cycle down RPM after two shots; used for Abakan/AN-94
-            if (GetCurrentFireMode() == 2 || (cycleDown == true && m_iShotNum <= 1))
+            // Mortan: особая скорострельность в абакане работает и без отсечки по два патрона!
+            if (/*GetCurrentFireMode() == 2 || */ cycleDown == true && m_iShotNum <= 1)
                 fShotTimeCounter = modeShotTime;
             else
                 fShotTimeCounter = fOneShotTime;
             // Alundaio: END
 
             ++m_iShotNum;
+            if (m_iNeedShotNum > 0)
+            {
+                --m_iNeedShotNum;
+                SetPending(TRUE);
+            }
 
             OnShot();
 
@@ -591,6 +627,12 @@ void CWeaponMagazined::state_Fire(float dt)
             m_bStopedAfterQueueFired = true;
 
         UpdateSounds();
+    }
+
+    if (m_iNeedShotNum > 0 && iAmmoElapsed == 0)
+    {
+        StopShooting();
+        SetPending(FALSE);
     }
 
     if (fShotTimeCounter < 0)
@@ -609,7 +651,11 @@ void CWeaponMagazined::state_Fire(float dt)
         if (iAmmoElapsed == 0)
             OnMagazineEmpty();
 
-        StopShooting();
+        if (m_iNeedShotNum == 0)
+        {
+            StopShooting();
+            SetPending(FALSE);
+        }
     }
     else
     {
@@ -763,9 +809,8 @@ void CWeaponMagazined::PlayReloadSound()
     }
 }
 
-
 void CWeaponMagazined::PlayAnimUnmis()
-{ 
+{
     auto state = GetState();
     VERIFY(state == eUnmis);
 
@@ -775,7 +820,7 @@ void CWeaponMagazined::PlayAnimUnmis()
         PlayHUDMotion("anm_reload", true, this, state);
 }
 
-void CWeaponMagazined::PlaySoundUnmis() 
+void CWeaponMagazined::PlaySoundUnmis()
 {
     if (m_sounds_enabled)
     {
@@ -847,7 +892,7 @@ bool CWeaponMagazined::Action(u16 cmd, u32 flags)
         if (flags & CMD_START)
             if (iAmmoElapsed < iMagazineSize || IsMisfire())
             {
-                if (GetState() == eUnmis) //Rietmon: Запрещаем перезарядку, если играет анима передергивания затвора
+                if (GetState() == eUnmis) // Rietmon: Запрещаем перезарядку, если играет анима передергивания затвора
                     return false;
 
                 PIItem Det = Actor()->inventory().ItemFromSlot(DETECTOR_SLOT);

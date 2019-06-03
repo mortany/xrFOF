@@ -114,6 +114,12 @@ public:
     virtual void StopedAfterQueueFired(bool value) { m_bStopedAfterQueueFired = value; }
     virtual float GetFireDispersion(float cartridge_k, bool for_crosshair = false);
 
+	// Mortan: блок нового кода, нужно перенести всё сюда дабы не искать
+protected:
+	//количество выстрелов которое оружее должно сделать 
+    //при однократном нажатии на спусковой крючок
+    int m_iNeedShotNum;
+
 protected:
     //максимальный размер очереди, которой можно стрельнуть
     int m_iQueueSize;

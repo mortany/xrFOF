@@ -59,6 +59,10 @@ protected:
     // Weapon fires now
     bool bWorking;
 
+	// Mortan: спец флаг для отсечки по два\три патрона
+	// С этим флагом автомат отстреливает сразу всю очередь
+    bool bPUBGBurst;
+
     float fOneShotTime;
     float modeShotTime;
     bool cycleDown;
