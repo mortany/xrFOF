@@ -55,6 +55,7 @@ CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon()
     m_fOldBulletSpeed = 0;
     m_iQueueSize = WEAPON_ININITE_QUEUE;
     m_iNeedShotNum = 0;
+    iMagSizeCurrent = 0;
     m_bLockType = false;
 }
 
@@ -274,6 +275,7 @@ void CWeaponMagazined::OnMagazineEmpty()
 {
     if (GetState() == eIdle)
     {
+        m_iNeedShotNum = 0;
         OnEmptyClick();
         return;
     }
@@ -384,16 +386,14 @@ void CWeaponMagazined::ReloadMagazine()
 
     //нет патронов для перезарядки
     if (!m_pCurrentAmmo && !unlimited_ammo())
-        return;
-
-    int iMagSizeCurrent = (iAmmoElapsed == 0) ? iMagazineSize : iMagazineSize + 1;
-
+        return;    
+   
     //разрядить магазин, если загружаем патронами другого типа
     if (!m_bLockType && !m_magazine.empty() &&
         (!m_pCurrentAmmo || xr_strcmp(m_pCurrentAmmo->cNameSect(), *m_magazine.back().m_ammoSect)))
     {
-        UnloadMagazine();
         iMagSizeCurrent = iMagazineSize;
+        UnloadMagazine();        
     }
 
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
@@ -431,18 +431,6 @@ void CWeaponMagazined::ReloadMagazine()
 
 void CWeaponMagazined::OnStateSwitch(u32 S, u32 oldState)
 {
-    // Mortan: хак для режимов отсечки по два\три патрона, предназначен для
-    // симуляции нажатия на спусковой крючок несколько раз, чисто игровая механика
-    // в реальности оно работает не так.
-
-    /*if (m_iNeedShotNum > 0)
-    {
-        if (oldState == eFire && S == eIdle)
-        {
-            FireStart();
-        }
-    }*/
-
     inherited::OnStateSwitch(S, oldState);
     CInventoryOwner* owner = smart_cast<CInventoryOwner*>(this->H_Parent());
     switch (S)
@@ -839,6 +827,8 @@ void CWeaponMagazined::switch2_Unmis()
 void CWeaponMagazined::switch2_Reload()
 {
     CWeapon::FireEnd();
+
+    iMagSizeCurrent = (iAmmoElapsed > 0) ? iMagazineSize + 1 : iMagazineSize;
 
     PlayReloadSound();
     PlayAnimReload();
