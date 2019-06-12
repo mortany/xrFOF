@@ -86,6 +86,7 @@ CWeapon::CWeapon()
     ScopeIsHasTexture = false;
     bScopeIsLoaded = false;
     m_nearwall_last_hud_fov = psHUD_FOV_def;
+    m_zoom_params.m_fSecondVPFovFactor = 0.0f;
 }
 
 CWeapon::~CWeapon()
@@ -333,6 +334,19 @@ void CWeapon::ForceUpdateFireParticles()
     }
 }
 
+void CWeapon::LoadMODParams(pcstr section)
+{
+    // Модификатор для HUD FOV от бедра
+    m_hud_FOV_add_mod = READ_IF_EXISTS(pSettings, r_float, section, "hud_fov_mod", 0.f);
+    m_hud_FOV_add_mod_when_zoom = READ_IF_EXISTS(pSettings, r_float, section, "hud_fov_in_zoom", 0.f);	
+
+    // Параметры изменения HUD FOV, когда игрок стоит вплотную к стене
+    m_nearwall_dist_min = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_dist_min", 0.5f);
+    m_nearwall_dist_max = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_dist_max", 1.f);
+    m_nearwall_target_hud_fov = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_target_hud_fov", 0.27f);
+    m_nearwall_speed_mod = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_speed_mod", 10.f);
+}
+
 void CWeapon::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -514,14 +528,8 @@ void CWeapon::Load(LPCSTR section)
     m_zoom_params.m_sUseZoomPostprocess = nullptr;
     m_zoom_params.m_sUseBinocularVision = nullptr;
 
-    // Модификатор для HUD FOV от бедра
-    m_hud_fov_add_mod = READ_IF_EXISTS(pSettings, r_float, section, "hud_fov_addition_modifier", 0.f);
-
-    // Параметры изменения HUD FOV, когда игрок стоит вплотную к стене
-    m_nearwall_dist_min = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_dist_min", 0.5f);
-    m_nearwall_dist_max = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_dist_max", 1.f);
-    m_nearwall_target_hud_fov = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_target_hud_fov", 0.27f);
-    m_nearwall_speed_mod = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_speed_mod", 10.f);
+	// Mortan: все новые фишки стоит добавлять внутрь фукнции
+    LoadMODParams(section);
 
     UseAltScope = LoadNewScopes(section);
 
@@ -1612,7 +1620,12 @@ float CWeapon::GetHudFov()
             ((dist - m_nearwall_dist_min) / (m_nearwall_dist_max - m_nearwall_dist_min)); // 0.f ... 1.f
 
         // Рассчитываем базовый HUD FOV от бедра
-        float fBaseFov = psHUD_FOV_def + m_hud_fov_add_mod;
+        float fBaseFov = psHUD_FOV_def + m_hud_FOV_add_mod;
+
+		//Если мы целимся то прибавляем еще один параметр
+        if (m_zoom_params.m_fZoomRotationFactor > 0.05f)
+            fBaseFov += m_hud_FOV_add_mod_when_zoom;
+
         clamp(fBaseFov, 0.0f, FLT_MAX);
 
         // Плавно высчитываем итоговый FOV от бедра

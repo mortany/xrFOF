@@ -117,7 +117,7 @@ void CWeaponMagazinedWGrenade::switch2_Reload()
     if (m_bGrenadeMode)
     {
         PlaySound("sndReloadG", get_LastFP2());
-
+        iMagSizeCurrent = iMagazineSize;
         PlayHUDMotion("anm_reload_g", FALSE, this, GetState());
         SetPending(TRUE);
     }

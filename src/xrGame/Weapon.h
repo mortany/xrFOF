@@ -81,11 +81,14 @@ public:
     IC float GetSecondVPZoomFactor() const { return m_zoom_params.m_fSecondVPFovFactor; }
     IC float IsSecondVPZoomPresent() const { return GetSecondVPZoomFactor() > 0.000f; }
 
+    void LoadMODParams(pcstr section);
+
     void UpdateSecondVP();
 
     //Отвечают за коллизию
     //TODO: переработать коллизию
-    float m_hud_fov_add_mod;
+    float m_hud_FOV_add_mod_when_zoom;
+    float m_hud_FOV_add_mod;
     float m_nearwall_dist_max;
     float m_nearwall_dist_min;
     float m_nearwall_last_hud_fov;

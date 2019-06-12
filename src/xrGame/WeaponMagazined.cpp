@@ -480,6 +480,7 @@ void CWeaponMagazined::UpdateCL()
         case eIdle:
         {
             fShotTimeCounter -= dt;
+            m_iNeedShotNum = 0;
             clamp(fShotTimeCounter, 0.0f, flt_max);
         }
         break;
