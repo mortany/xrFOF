@@ -19,12 +19,9 @@ CArtefactContainer::~CArtefactContainer() {}
 
 void CArtefactContainer::AddAvailableItems(TIItemContainer& items_container) const
 {
-    xr_vector<u16>::const_iterator it = m_items.begin();
-    xr_vector<u16>::const_iterator it_e = m_items.end();
-
-    for (; it != it_e; ++it)
+    for (const u16 &it : m_items)
     {
-        PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(*it));
+        PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(it));
         VERIFY(itm);
         items_container.push_back(itm);
     }
@@ -36,9 +33,9 @@ float CArtefactContainer::Weight() const
 {
     float weight = CInventoryItemObject::Weight();
 
-    for (xr_vector<u16>::const_iterator it = m_items.begin(); m_items.end() != it; ++it)
+    for (const u16 &it : m_items)
     {
-        PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(*it));
+        PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(it));
         VERIFY(itm);
         weight += itm->Weight();
     }
@@ -100,7 +97,7 @@ void CArtefactContainer::OnEvent(NET_Packet& P, u16 type)
         bool dont_create_shell = (type == GE_TRADE_SELL) || just_before_destroy;
 
         itm->H_SetParent(NULL, dont_create_shell);
-        avaible_slots++;
+        ++avaible_slots;
     }
     break;
     };
