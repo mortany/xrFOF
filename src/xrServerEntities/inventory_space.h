@@ -20,10 +20,6 @@ enum
     TORCH_SLOT, // torch
     ARTEFACT_SLOT, // artefact
     HELMET_SLOT,
-<<<<<<< HEAD
-    // Alundaio: More slots for custom uses
-=======
->>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
     CUSTOM_SLOT_1,
     CUSTOM_SLOT_2,
     CUSTOM_SLOT_3,
@@ -88,12 +84,8 @@ struct II_BriefInfo
     shared_str cur_ammo;
     shared_str fmj_ammo;
     shared_str ap_ammo;
-<<<<<<< HEAD
-    shared_str third_ammo; // Alundaio
-=======
     shared_str third_ammo; //Alundaio
     shared_str total_ammo;
->>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
     shared_str fire_mode;
 
     shared_str grenade;
@@ -106,12 +98,8 @@ struct II_BriefInfo
         cur_ammo = "";
         fmj_ammo = "";
         ap_ammo = "";
-<<<<<<< HEAD
-        third_ammo = ""; // Alundaio
-=======
         third_ammo = ""; //Alundaio
         total_ammo = "";
->>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
         fire_mode = "";
         grenade = "";
     }

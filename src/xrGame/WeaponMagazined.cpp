@@ -182,16 +182,9 @@ void CWeaponMagazined::FireStart()
                 OnMagazineEmpty();
         }
     }
-<<<<<<< HEAD
-    else
-    { // misfire
-      // Alundaio
-#ifdef EXTENDED_WEAPON_CALLBACKS
-=======
     else // misfire
     {
         // Alundaio
->>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
         CGameObject* object = smart_cast<CGameObject*>(H_Parent());
         if (object)
         {
@@ -1305,15 +1298,6 @@ void CWeaponMagazined::OnZoomIn()
     if (GetState() == eIdle)
         PlayAnimIdle();
 
-<<<<<<< HEAD
-        // Alundaio: callback not sure why vs2013 gives error, it's fine
-#ifdef EXTENDED_WEAPON_CALLBACKS
-    CGameObject* object = smart_cast<CGameObject*>(H_Parent());
-    if (object)
-        object->callback(GameObject::eOnWeaponZoomIn)(object->lua_game_object(), this->lua_game_object());
-#endif
-    //-Alundaio
-=======
     // Alundaio
     CGameObject* object = smart_cast<CGameObject*>(H_Parent());
     if (object)
@@ -1322,7 +1306,6 @@ void CWeaponMagazined::OnZoomIn()
         if (cb)
             cb(object->lua_game_object(), this->lua_game_object());
     }
->>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
 
     CActor* pActor = smart_cast<CActor*>(H_Parent());
     if (pActor)
@@ -1347,12 +1330,7 @@ void CWeaponMagazined::OnZoomOut()
     if (GetState() == eIdle)
         PlayAnimIdle();
 
-<<<<<<< HEAD
-        // Alundaio
-#ifdef EXTENDED_WEAPON_CALLBACKS
-=======
     //Alundaio
->>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
     CGameObject* object = smart_cast<CGameObject*>(H_Parent());
     if (object)
     {

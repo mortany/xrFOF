@@ -23,11 +23,8 @@
 #include "eatable_item.h"
 #include "UICellItem.h"
 #include "xrGame/game_type.h"
-<<<<<<< HEAD
 #include "UIContainerInfo.h"
-=======
 #include "UIHelper.h"
->>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
 
 extern const LPCSTR g_inventory_upgrade_xml;
 

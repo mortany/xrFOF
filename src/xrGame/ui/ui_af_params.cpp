@@ -22,11 +22,8 @@ CUIArtefactParams::CUIArtefactParams()
         m_restore_item[i] = NULL;
     }
     m_additional_weight = NULL;
-<<<<<<< HEAD
     m_charge_value = NULL;
-=======
     m_Prop_line = nullptr;
->>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
 }
 
 CUIArtefactParams::~CUIArtefactParams()
@@ -107,7 +104,6 @@ void CUIArtefactParams::InitFromXml(CUIXml& xml)
     CUIXmlInit::InitWindow(xml, base, 0, this);
     xml.SetLocalRoot(base_node);
 
-<<<<<<< HEAD
     //Mortan: уровень заряда артефакта
     m_charge_value = new UIArtefactParamItem();
     m_charge_value->Init(xml, "radiation_immunity");
@@ -120,15 +116,8 @@ void CUIArtefactParams::InitFromXml(CUIXml& xml)
 
     xml.SetLocalRoot(base_node);
     //-------------------------------
-
-    m_Prop_line = new CUIStatic();
-    AttachChild(m_Prop_line);
-    m_Prop_line->SetAutoDelete(false);
-    CUIXmlInit::InitStatic(xml, "prop_line", 0, m_Prop_line);
-=======
     if ((m_Prop_line = UIHelper::CreateStatic(xml, "prop_line", this, false)))
         m_Prop_line->SetAutoDelete(false);
->>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
 
     pos_prop.set(m_Prop_line->GetWndPos());
 
@@ -189,7 +178,6 @@ bool CUIArtefactParams::Check(const shared_str& af_section)
 void CUIArtefactParams::SetInfo(shared_str const& af_section, float charge, bool can_charge)
 {
     DetachAll();
-<<<<<<< HEAD
     float h;
     Fvector2 pos;
 
@@ -215,14 +203,13 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section, float charge, bool
     }
     else
     {
-        m_Prop_line->SetWndPos(pos_prop);
-        AttachChild(m_Prop_line);
-        h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
+        if (m_Prop_line)
+        {
+            m_Prop_line->SetWndPos(pos_prop);
+            AttachChild(m_Prop_line);
+            h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
+        }
     }
-=======
-    if (m_Prop_line)
-        AttachChild(m_Prop_line);
->>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
 
     CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
     if (!actor)
@@ -230,14 +217,7 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section, float charge, bool
         return;
     }
 
-<<<<<<< HEAD
     float val = 0.0f, max_val = 1.0f;
-=======
-    float val = 0.0f, max_val = 1.0f, h = 0.0f;
-    Fvector2 pos;
-    if (m_Prop_line)
-        h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
->>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
 
     for (u32 i = 0; i < ALife::infl_max_count; ++i)
     {

@@ -519,7 +519,6 @@ void CWeapon::Load(LPCSTR section)
     m_zoom_params.m_bZoomEnabled = !!pSettings->r_bool(section, "zoom_enabled");
     m_zoom_params.m_fZoomRotateTime = pSettings->r_float(section, "zoom_rotate_time");
 
-<<<<<<< HEAD
     m_zoom_params.m_bUseDynamicZoom = READ_IF_EXISTS(pSettings, r_bool, section, "scope_dynamic_zoom", false);
     m_zoom_params.m_sUseZoomPostprocess = nullptr;
     m_zoom_params.m_sUseBinocularVision = nullptr;
@@ -531,40 +530,6 @@ void CWeapon::Load(LPCSTR section)
 
     if (!UseAltScope)
         LoadOriginalScopes(section);
-=======
-    if (m_eScopeStatus == ALife::eAddonAttachable)
-    {
-        if (pSettings->line_exist(section, "scopes_sect"))
-        {
-            LPCSTR str = pSettings->r_string(section, "scopes_sect");
-            for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-            {
-                string128 scope_section;
-                _GetItem(str, i, scope_section);
-                m_scopes.push_back(scope_section);
-            }
-        }
-        else
-        {
-            m_scopes.push_back(section);
-        }
-    }
-    else if (m_eScopeStatus == ALife::eAddonPermanent)
-    {
-        m_zoom_params.m_fScopeZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
-        if (!GEnv.isDedicatedServer)
-        {
-            m_UIScope = new CUIWindow();
-            if (!pWpnScopeXml)
-            {
-                pWpnScopeXml = new CUIXml();
-                pWpnScopeXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scopes.xml");
-            }
-            shared_str scope_tex_name = pSettings->r_string(cNameSect(), "scope_texture");
-            CUIXmlInit::InitWindow(*pWpnScopeXml, scope_tex_name.c_str(), 0, m_UIScope);
-        }
-    }
->>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
 
     if (m_eSilencerStatus == ALife::eAddonAttachable)
     {
