@@ -312,7 +312,7 @@ void CLevel::Send(NET_Packet& P, u32 dwFlags, u32 dwTimeout)
     {
         // anti-cheat
         phTimefactor = 1.f;
-        psDeviceFlags.set(rsConstantFPS, FALSE);
+        psConstantFPS = ConstantFPS_off;
     }
 }
 
@@ -636,7 +636,7 @@ void CLevel::net_OnChangeSelfName(NET_Packet* P)
         xr_strcpy(tmpstr, *m_caClientOptions);
         *(strstr(tmpstr, "name=") + 5) = 0;
         xr_strcat(tmpstr, NewName);
-        const char* ptmp = strstr(strstr(*m_caClientOptions, "name="), "/");
+        pcstr ptmp = strchr(strstr(*m_caClientOptions, "name="), '/');
         if (ptmp)
             xr_strcat(tmpstr, ptmp);
         m_caClientOptions = tmpstr;

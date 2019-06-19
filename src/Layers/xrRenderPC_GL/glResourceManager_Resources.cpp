@@ -332,7 +332,7 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
     m_gs.insert(std::make_pair(_gs->set_name(name), _gs));
     if (0 == xr_stricmp(name, "null"))
     {
-        _gs->sh = NULL;
+        _gs->sh = 0;
         return _gs;
     }
 
@@ -551,7 +551,7 @@ void	CResourceManager::DBG_VerifyTextures	()
 {
 	map_Texture::iterator I		= m_textures.begin	();
 	map_Texture::iterator E		= m_textures.end	();
-	for (; I!=E; I++) 
+	for (; I!=E; ++I) 
 	{
 		R_ASSERT(I->first);
 		R_ASSERT(I->second);

@@ -3,6 +3,7 @@
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
 #include "SoundRender_Cache.h"
+#include "xrCommon/xr_unordered_map.h"
 
 class CSoundRender_Core : public ISoundManager
 {
@@ -20,7 +21,7 @@ private:
     volatile bool isLocked;
 
 protected:
-    void _create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type) override;
+    bool _create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) override;
     void _destroy_data(ref_sound_data& S) override;
 
     bool bListenerMoved;
@@ -54,7 +55,7 @@ protected:
     CDB::MODEL* geom_ENV;
 
     // Containers
-    xr_vector<CSoundRender_Source*> s_sources;
+    xr_unordered_map<xr_string, CSoundRender_Source*> s_sources;
     xr_vector<CSoundRender_Emitter*> s_emitters;
     u32 s_emitters_u; // emitter update marker
     xr_vector<CSoundRender_Target*> s_targets;
@@ -87,7 +88,7 @@ public:
 
     // Sound interface
     void verify_refsound(ref_sound& S);
-    void create(ref_sound& S, pcstr fName, esound_type sound_type, int game_type) override;
+    bool create(ref_sound& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) override;
     void attach_tail(ref_sound& S, pcstr fName) override;
 
     void clone(ref_sound& S, const ref_sound& from, esound_type sound_type, int game_type) override;
@@ -127,7 +128,10 @@ public:
     virtual void set_environment_size(CSound_environment* src_env, CSound_environment** dst_env);
 
 public:
-    CSoundRender_Source* i_create_source(pcstr name);
+    bool i_create_source(CSound_source*& result, pcstr name, bool replaceWithNoSound = true);
+    bool i_create_source(CSoundRender_Source*& result, pcstr name, bool replaceWithNoSound = true);
+    CSoundRender_Source* i_create_source(pcstr name, bool replaceWithNoSound = true);
+
     void i_destroy_source(CSoundRender_Source* S);
     CSoundRender_Emitter* i_play(ref_sound* S, bool _loop, float delay);
     void i_start(CSoundRender_Emitter* E);
@@ -136,9 +140,10 @@ public:
     bool i_allow_play(CSoundRender_Emitter* E);
     bool i_locked() override { return isLocked; }
     void object_relcase(IGameObject* obj) override;
+    void i_create_all_sources();
 
     float get_occlusion_to(const Fvector& hear_pt, const Fvector& snd_pt, float dispersion = 0.2f) override;
-    float get_occlusion(Fvector& P, float R, Fvector* occ);
+    float get_occlusion(Fvector& P, float R, Fvector* occ) override;
     CSoundRender_Environment* get_environment(const Fvector& P);
 
     void env_load();

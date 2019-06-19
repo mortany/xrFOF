@@ -176,6 +176,8 @@ void CActor::IR_OnKeyboardPress(int cmd)
     case kQUICK_USE_3:
     case kQUICK_USE_4:
     {
+        if (!CurrentGameUI()->GetActorMenu().m_pQuickSlot)
+            break;
         const shared_str& item_name = g_quick_use_slots[cmd - kQUICK_USE_1];
         if (item_name.size())
         {
@@ -235,6 +237,9 @@ void CActor::IR_OnKeyboardRelease(int cmd)
 
     if (g_Alive())
     {
+        if (cmd == kUSE && !psActorFlags.test(AF_MULTI_ITEM_PICKUP))
+            m_bPickupMode = false;
+
         if (m_holder)
         {
             m_holder->OnKeyboardRelease(cmd);
@@ -420,6 +425,9 @@ void CActor::ActorUse()
         CGameObject::u_EventSend(P);
         return;
     }
+
+    if (!psActorFlags.test(AF_MULTI_ITEM_PICKUP))
+        m_bPickupMode = true;
 
     if (character_physics_support()->movement()->PHCapture())
         character_physics_support()->movement()->PHReleaseObject();

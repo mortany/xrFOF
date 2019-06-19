@@ -23,7 +23,11 @@
 #include "eatable_item.h"
 #include "UICellItem.h"
 #include "xrGame/game_type.h"
+<<<<<<< HEAD
 #include "UIContainerInfo.h"
+=======
+#include "UIHelper.h"
+>>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
 
 extern const LPCSTR g_inventory_upgrade_xml;
 
@@ -83,45 +87,15 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
 
         delay = uiXml.ReadAttribInt("main_frame", 0, "delay", 500);
     }
-    if (uiXml.NavigateToNode("background_frame", 0))
-    {
-        UIBackground = new CUIFrameWindow();
-        UIBackground->SetAutoDelete(true);
-        AttachChild(UIBackground);
-        CUIXmlInit::InitFrameWindow(uiXml, "background_frame", 0, UIBackground);
-    }
-    m_complex_desc = false;
-    if (uiXml.NavigateToNode("static_name", 0))
-    {
-        UIName = new CUITextWnd();
-        AttachChild(UIName);
-        UIName->SetAutoDelete(true);
-        CUIXmlInit::InitTextWnd(uiXml, "static_name", 0, UIName);
+    UIBackground = UIHelper::CreateFrameWindow(uiXml, "background_frame", this, false);
+
+    UIName = UIHelper::CreateTextWnd(uiXml, "static_name", this, false);
+    if (UIName)
         m_complex_desc = (uiXml.ReadAttribInt("static_name", 0, "complex_desc", 0) == 1);
-    }
-    if (uiXml.NavigateToNode("static_weight", 0))
-    {
-        UIWeight = new CUITextWnd();
-        AttachChild(UIWeight);
-        UIWeight->SetAutoDelete(true);
-        CUIXmlInit::InitTextWnd(uiXml, "static_weight", 0, UIWeight);
-    }
 
-    if (uiXml.NavigateToNode("static_cost", 0))
-    {
-        UICost = new CUITextWnd();
-        AttachChild(UICost);
-        UICost->SetAutoDelete(true);
-        CUIXmlInit::InitTextWnd(uiXml, "static_cost", 0, UICost);
-    }
-
-    if (uiXml.NavigateToNode("static_no_trade", 0))
-    {
-        UITradeTip = new CUITextWnd();
-        AttachChild(UITradeTip);
-        UITradeTip->SetAutoDelete(true);
-        CUIXmlInit::InitTextWnd(uiXml, "static_no_trade", 0, UITradeTip);
-    }
+    UIWeight = UIHelper::CreateTextWnd(uiXml, "static_weight", this, false);
+    UICost = UIHelper::CreateTextWnd(uiXml, "static_cost", this, false);
+    UITradeTip = UIHelper::CreateTextWnd(uiXml, "static_no_trade", this, false);
 
     if (uiXml.NavigateToNode("descr_list", 0))
     {
@@ -190,12 +164,13 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
 {
     if (!pCellItem)
     {
-        m_pInvItem = NULL;
+        m_pInvItem = nullptr;
         Enable(false);
         return;
     }
 
-    PIItem pInvItem = (PIItem)pCellItem->m_pData;
+    PIItem pInvItem = static_cast<PIItem>(pCellItem->m_pData);
+
     m_pInvItem = pInvItem;
     Enable(NULL != m_pInvItem);
     if (!m_pInvItem)

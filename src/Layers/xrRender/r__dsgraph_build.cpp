@@ -8,8 +8,6 @@
 #include "FLOD.h"
 #include "ParticleGroup.h"
 #include "FTreeVisual.h"
-#include "xrEngine/GameFont.h"
-#include "xrEngine/PerformanceAlert.hpp"
 
 using namespace R_dsgraph;
 
@@ -735,6 +733,7 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
     break;
     }
 }
+<<<<<<< HEAD
 
 // ============================= NEW MEMBERS ===========================
 
@@ -1168,3 +1167,5 @@ void D3DXRenderBase::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     }
     BasicStats.FrameStart();
 }
+=======
+>>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237

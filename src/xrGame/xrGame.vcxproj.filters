@@ -6473,11 +6473,16 @@
     <ClInclude Include="ui\UILoadingScreenHardcoded.h">
       <Filter>UI\Common\LoadingScreen</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="ArtContainer.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Container</Filter>
     </ClInclude>
     <ClInclude Include="ui\UIContainerInfo.h">
       <Filter>UI\Common\ui-item-infos</Filter>
+=======
+    <ClInclude Include="ui\UIRankFaction.h">
+      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
+>>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -9813,11 +9818,16 @@
     <ClCompile Include="AnselManager.cpp">
       <Filter>Core\Client\Ansel</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="ArtContainer.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Container</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIContainerInfo.cpp">
       <Filter>UI\Common\ui-item-infos</Filter>
+=======
+    <ClCompile Include="ui\UIRankFaction.cpp">
+      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
+>>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -9832,9 +9842,9 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="..\TypeHelper.natvis" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
 </Project>

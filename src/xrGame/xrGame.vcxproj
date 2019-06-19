@@ -31,37 +31,38 @@
     <RootNamespace>xrGame</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(SolutionDir)Common.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -69,27 +70,21 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
@@ -109,12 +104,12 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"</Command>
-      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll</Inputs>
-      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll</Outputs>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll;</Inputs>
+      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll;</Outputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -126,12 +121,12 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"</Command>
-      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll</Inputs>
-      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll</Outputs>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll;</Inputs>
+      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll;</Outputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -143,12 +138,12 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"</Command>
-      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll</Inputs>
-      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll</Outputs>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll;</Inputs>
+      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll;</Outputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -160,12 +155,12 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"</Command>
-      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll</Inputs>
-      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll</Outputs>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll;</Inputs>
+      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll;</Outputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -178,12 +173,12 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"</Command>
-      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll</Inputs>
-      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll</Outputs>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll;</Inputs>
+      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll;</Outputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -195,12 +190,12 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"</Command>
-      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll</Inputs>
-      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll</Outputs>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll;</Inputs>
+      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll;</Outputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -1539,6 +1534,7 @@
     <ClInclude Include="ui\UIPdaKillMessage.h" />
     <ClInclude Include="ui\UIPdaMsgListItem.h" />
     <ClInclude Include="ui\UIPdaWnd.h" />
+    <ClInclude Include="ui\UIRankFaction.h" />
     <ClInclude Include="ui\UIRankIndicator.h" />
     <ClInclude Include="ui\UIRankingWnd.h" />
     <ClInclude Include="ui\UIScriptWnd.h" />
@@ -3505,6 +3501,7 @@
     <ClCompile Include="ui\UIPdaKillMessage.cpp" />
     <ClCompile Include="ui\UIPdaMsgListItem.cpp" />
     <ClCompile Include="ui\UIPdaWnd.cpp" />
+    <ClCompile Include="ui\UIRankFaction.cpp" />
     <ClCompile Include="ui\UIRankIndicator.cpp" />
     <ClCompile Include="ui\UIRankingWnd.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -3694,6 +3691,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

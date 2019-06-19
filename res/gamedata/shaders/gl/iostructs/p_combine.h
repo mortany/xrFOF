@@ -2,6 +2,7 @@
 out vec4 SV_Target0;
 out vec4 SV_Target1;
 in vec4 gl_FragCoord;
+
 #ifdef MSAA_OPTIMIZATION
 in int gl_SampleID;
 #endif

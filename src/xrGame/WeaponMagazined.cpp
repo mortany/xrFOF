@@ -182,15 +182,23 @@ void CWeaponMagazined::FireStart()
                 OnMagazineEmpty();
         }
     }
+<<<<<<< HEAD
     else
     { // misfire
       // Alundaio
 #ifdef EXTENDED_WEAPON_CALLBACKS
+=======
+    else // misfire
+    {
+        // Alundaio
+>>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
         CGameObject* object = smart_cast<CGameObject*>(H_Parent());
         if (object)
-            object->callback(GameObject::eOnWeaponJammed)(object->lua_game_object(), this->lua_game_object());
-#endif
-        //-Alundaio
+        {
+            auto& cb = object->callback(GameObject::eOnWeaponJammed);
+            if (cb)
+                cb(object->lua_game_object(), this->lua_game_object());
+        }
 
         if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
             CurrentGameUI()->AddCustomStatic("gun_jammed", true);
@@ -932,7 +940,7 @@ bool CWeaponMagazined::CanAttach(PIItem pIItem)
                 (m_scopes[cur_scope]->m_sScopeName == pIItem->object().cNameSect())*/)
     {
         auto it = m_scopes.begin();
-        for (; it != m_scopes.end(); it++)
+        for (; it != m_scopes.end(); ++it)
         {
             if (!UseAltScope)
             {
@@ -966,7 +974,7 @@ bool CWeaponMagazined::CanDetach(const char* item_section_name)
            (m_scopes[cur_scope]->m_sScopeName	== item_section_name))*/
     {
         auto it = m_scopes.begin();
-        for (; it != m_scopes.end(); it++)
+        for (; it != m_scopes.end(); ++it)
         {
             if (!UseAltScope)
             {
@@ -1006,7 +1014,7 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
        (m_scopes[cur_scope]->m_sScopeName == pIItem->object().cNameSect())*/)
     {
         auto it = m_scopes.begin();
-        for (; it != m_scopes.end(); it++)
+        for (; it != m_scopes.end(); ++it)
         {
             if (!UseAltScope)
             {
@@ -1060,7 +1068,7 @@ bool CWeaponMagazined::DetachScope(const char* item_section_name, bool b_spawn_i
     bool detached = false;
     LPCSTR iter_scope_name;
     auto it = m_scopes.begin();
-    for (; it != m_scopes.end(); it++)
+    for (; it != m_scopes.end(); ++it)
     {
         if (!UseAltScope)
         {
@@ -1297,6 +1305,7 @@ void CWeaponMagazined::OnZoomIn()
     if (GetState() == eIdle)
         PlayAnimIdle();
 
+<<<<<<< HEAD
         // Alundaio: callback not sure why vs2013 gives error, it's fine
 #ifdef EXTENDED_WEAPON_CALLBACKS
     CGameObject* object = smart_cast<CGameObject*>(H_Parent());
@@ -1304,6 +1313,16 @@ void CWeaponMagazined::OnZoomIn()
         object->callback(GameObject::eOnWeaponZoomIn)(object->lua_game_object(), this->lua_game_object());
 #endif
     //-Alundaio
+=======
+    // Alundaio
+    CGameObject* object = smart_cast<CGameObject*>(H_Parent());
+    if (object)
+    {
+        auto& cb = object->callback(GameObject::eOnWeaponZoomIn);
+        if (cb)
+            cb(object->lua_game_object(), this->lua_game_object());
+    }
+>>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
 
     CActor* pActor = smart_cast<CActor*>(H_Parent());
     if (pActor)
@@ -1328,13 +1347,19 @@ void CWeaponMagazined::OnZoomOut()
     if (GetState() == eIdle)
         PlayAnimIdle();
 
+<<<<<<< HEAD
         // Alundaio
 #ifdef EXTENDED_WEAPON_CALLBACKS
+=======
+    //Alundaio
+>>>>>>> 5ad33ea8de3be70ddbbf75299502fb8c88d16237
     CGameObject* object = smart_cast<CGameObject*>(H_Parent());
     if (object)
-        object->callback(GameObject::eOnWeaponZoomOut)(object->lua_game_object(), this->lua_game_object());
-#endif
-    //-Alundaio
+    {
+        auto& cb = object->callback(GameObject::eOnWeaponZoomOut);
+        if (cb)
+            cb(object->lua_game_object(), this->lua_game_object());
+    }
 
     CActor* pActor = smart_cast<CActor*>(H_Parent());
 
@@ -1440,7 +1465,7 @@ bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
     VERIFY(m_pInventory);
     string32 int_str;
 
-    int ae = GetAmmoElapsed();
+    const int ae = GetAmmoElapsed();
     xr_sprintf(int_str, "%d", ae);
     info.cur_ammo = int_str;
 
@@ -1463,7 +1488,10 @@ bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
     {
         return false;
     }
-    GetSuitableAmmoTotal(); // update m_BriefInfo_CalcFrame
+    const int at = GetSuitableAmmoTotal(); // update m_BriefInfo_CalcFrame
+    xr_sprintf(int_str, "%d", at);
+    info.total_ammo = int_str;
+    
     info.grenade = "";
 
     const u32 at_size = m_ammoTypes.size();

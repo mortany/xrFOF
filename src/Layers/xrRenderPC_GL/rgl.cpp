@@ -7,6 +7,7 @@
 #include "xrEngine/Environment.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
+#include "xrEngine/TaskScheduler.hpp"
 #include "Layers/xrRender/SkeletonCustom.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
@@ -448,23 +449,41 @@ void CRender::OnFrame()
             fastdelegate::FastDelegate0<>(&HOM,&CHOM::MT_RENDER));
     }
 }*/
+
+void CRender::BeforeFrame()
+{
+    // MT-HOM (@front)
+    TaskScheduler->AddTask("CHOM::MT_RENDER", Task::Type::Renderer,
+        { &HOM, &CHOM::MT_RENDER },
+        { &Device, &CRenderDevice::IsMTProcessingAllowed });
+}
+
 void CRender::OnFrame()
 {
     Models->DeleteQueue();
     if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
     {
         // MT-details (@front)
-        Device.seqParallel.insert(Device.seqParallel.begin(),
-                                  fastdelegate::FastDelegate0<>(Details, &CDetailManager::MT_CALC));
-
-        // MT-HOM (@front)
-        Device.seqParallel.insert(Device.seqParallel.begin(),
-                                  fastdelegate::FastDelegate0<>(&HOM, &CHOM::MT_RENDER));
+        TaskScheduler->AddTask("CDetailManager::MT_CALC", Task::Type::Renderer,
+            { Details, &CDetailManager::MT_CALC },
+            { &Device, &CRenderDevice::IsMTProcessingAllowed });
     }
 }
 
 void CRender::BeforeWorldRender() {}
 void CRender::AfterWorldRender() {}
+
+void CRender::MakeContextCurrent(bool acquire)
+{
+    int result;
+    if (acquire)
+        result = SDL_GL_MakeCurrent(HW.m_hWnd, HW.m_hRC);
+    else
+        result = SDL_GL_MakeCurrent(nullptr, nullptr);
+#ifdef WINDOWS // FIXME: find out why Linux always fails.. But works.
+    R_ASSERT2(result == 0, "Failed to switch OpenGL context");
+#endif
+}
 
 // Implementation
 IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return new CROS_impl(); }

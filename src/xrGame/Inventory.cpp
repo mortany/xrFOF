@@ -45,8 +45,17 @@ CInventory::CInventory()
 {
     m_fMaxWeight = pSettings->r_float("inventory", "max_weight");
 
-    u32 sz = LAST_SLOT + 1; //pSettings->r_s32("inventory", "slots_count"); //Alundaio: Get slot count directly to automate this process
+    u16 sz;
+    const u16 tempSlotsCount = pSettings->r_s16("inventory", "slots_count");
+    if (tempSlotsCount > 0 && tempSlotsCount <= LAST_SLOT)
+        sz = tempSlotsCount + 1;
+    else
+    {
+        Log("! [inventory] slots_count is less than 1 or more than LAST_SLOT");
+        sz = 1;
+    }
     m_slots.resize(sz + 1); // first is [1]
+    m_iLastSlot = sz - 1;
 
     m_iActiveSlot = NO_ACTIVE_SLOT;
     m_iNextActiveSlot = NO_ACTIVE_SLOT;
@@ -72,7 +81,7 @@ CInventory::CInventory()
     InitPriorityGroupsForQSwitch();
     m_next_item_iteration_time = 0;
 
-    for (u16 i = 0; i < LAST_SLOT + 1; ++i)
+    for (u16 i = 0; i < sz; ++i)
     {
         m_blocked_slots[i] = 0;
     }
@@ -1254,7 +1263,7 @@ bool CInventory::CanTakeItem(CInventoryItem* inventory_item) const
     if (!inventory_item->CanTake())
         return false;
     TIItemContainer::const_iterator it;
-    for (it = m_all.begin(); it != m_all.end(); it++)
+    for (it = m_all.begin(); it != m_all.end(); ++it)
         if ((*it)->object().ID() == inventory_item->object().ID())
             break;
     VERIFY3(it == m_all.end(), "item already exists in inventory", *inventory_item->object().cName());
@@ -1427,7 +1436,7 @@ void CInventory::TryDeactivateActiveSlot()
 
 void CInventory::BlockSlot(u16 slot_id)
 {
-    VERIFY(slot_id <= LAST_SLOT);
+    VERIFY(slot_id <= LastSlot());
 
     ++m_blocked_slots[slot_id];
 
@@ -1436,7 +1445,7 @@ void CInventory::BlockSlot(u16 slot_id)
 
 void CInventory::UnblockSlot(u16 slot_id)
 {
-    VERIFY(slot_id <= LAST_SLOT);
+    VERIFY(slot_id <= LastSlot());
     VERIFY2(m_blocked_slots[slot_id] > 0, make_string("blocked slot [%d] underflow").c_str());
 
     --m_blocked_slots[slot_id];
@@ -1444,7 +1453,7 @@ void CInventory::UnblockSlot(u16 slot_id)
 
 bool CInventory::IsSlotBlocked(u16 slot_id) const
 {
-    VERIFY(slot_id <= LAST_SLOT);
+    VERIFY(slot_id <= LastSlot());
     return m_blocked_slots[slot_id] > 0;
 }
 

@@ -9,6 +9,7 @@
 #include "ProgressBar/UIProgressShape.h"
 #include "TabControl/UITabControl.h"
 #include "Static/UIAnimatedStatic.h"
+#include "ListWnd/UIListWnd.h"
 #include "ListBox/UIListBox.h"
 #include "ComboBox/UIComboBox.h"
 #include "TrackBar/UITrackBar.h"
@@ -93,16 +94,10 @@ bool CUIXmlInitBase::InitWindow(CUIXml& xml_doc, LPCSTR path, int index, CUIWind
 
 bool CUIXmlInitBase::InitFrameWindow(CUIXml& xml_doc, LPCSTR path, int index, CUIFrameWindow* pWnd, bool fatal /*= true*/)
 {
-    const bool nodeExist = xml_doc.NavigateToNode(path, index);
-    if (!nodeExist)
-    {
-        R_ASSERT4(!fatal, "XML node not found", path, xml_doc.m_xml_file_name);
-        return false;
-    }
+    bool result = InitWindow(xml_doc, path, index, pWnd, fatal);
+    result &= InitTexture(xml_doc, path, index, pWnd, fatal);
 
-    InitTexture(xml_doc, path, index, pWnd);
-    InitWindow(xml_doc, path, index, pWnd);
-    return true;
+    return result;
 }
 
 bool CUIXmlInitBase::InitOptionsItem(CUIXml& xml_doc, LPCSTR path, int index, CUIOptionsItem* pWnd)
@@ -503,7 +498,6 @@ bool CUIXmlInitBase::InitProgressBar(CUIXml& xml_doc, LPCSTR path, int index, CU
     pWnd->SetRange(min, max);
     pWnd->SetProgressPos(ppos);
     pWnd->m_inertion = xml_doc.ReadAttribFlt(path, index, "inertion", 0.0f);
-    pWnd->colorSmoothing = xml_doc.ReadAttribInt(path, index, "color_smoothing");
 
     // progress
     strconcat(sizeof(buf), buf, path, ":progress");
@@ -558,16 +552,23 @@ bool CUIXmlInitBase::InitProgressShape(CUIXml& xml_doc, LPCSTR path, int index, 
 
     string256 _path;
 
-    if (xml_doc.NavigateToNode(strconcat(sizeof(_path), _path, path, ":back"), index))
+    strconcat(sizeof(_path), _path, path, ":back");
+    if (xml_doc.NavigateToNode(_path, index))
     {
-        R_ASSERT2(0, "unused <back> node in progress shape ");
+        pWnd->m_pBackground = new CUIStatic();
+        pWnd->m_pBackground->SetAutoDelete(true);
+        pWnd->AttachChild(pWnd->m_pBackground);
+        InitStatic(xml_doc, _path, index, pWnd->m_pBackground);
     }
 
-    if (xml_doc.NavigateToNode(strconcat(sizeof(_path), _path, path, ":front"), index))
+    strconcat(sizeof(_path), _path, path, ":front");
+    if (xml_doc.NavigateToNode(_path, index))
     {
-        R_ASSERT2(0, "unused <front> node in progress shape ");
+        pWnd->m_pTexture = new CUIStatic();
+        pWnd->m_pTexture->SetAutoDelete(true);
+        pWnd->AttachChild(pWnd->m_pTexture);
+        InitStatic(xml_doc, _path, index, pWnd->m_pTexture);
     }
-    //    InitStatic(xml_doc, strconcat(sizeof(_path),_path, path, ":front"), index, pWnd->m_pTexture);
 
     pWnd->m_sectorCount = xml_doc.ReadAttribInt(path, index, "sector_count", 8);
     pWnd->m_bClockwise = xml_doc.ReadAttribInt(path, index, "clockwise") ? true : false;
@@ -759,7 +760,13 @@ bool CUIXmlInitBase::InitTabControl(CUIXml& xml_doc, LPCSTR path, int index, CUI
         newButton = radio ? new CUIRadioButton() : new CUITabButton();
         status &= Init3tButton(xml_doc, "button", i, newButton);
         newButton->m_btn_id = xml_doc.ReadAttrib("button", i, "id");
-        R_ASSERT3(newButton->m_btn_id.size(), xml_doc.m_xml_file_name, path);
+        if (!newButton->m_btn_id.size())
+        {
+            string32 temp;
+            Msg("! [%s] doesn't have `id` tag in file [%s]", xml_doc.m_xml_file_name, path);
+            xr_sprintf(temp, "tab_button_%d", i);
+            newButton->m_btn_id = temp;
+        }
         pWnd->AddItem(newButton);
     }
 
@@ -781,9 +788,12 @@ bool CUIXmlInitBase::InitFrameLine(CUIXml& xml_doc, LPCSTR path, int index, CUIF
 
     string256 buf;
 
-    bool stretch_flag = xml_doc.ReadAttribInt(path, index, "stretch") ? true : false;
-    R_ASSERT(stretch_flag == false);
-    //.	pWnd->SetStretchTexture( stretch_flag );
+    bool stretch_flag = xml_doc.ReadAttribInt(path, index, "stretch");
+    if (stretch_flag)
+    {
+        Msg("~ [%s] stretch attribute is unsupported for [%s]", xml_doc.m_xml_file_name, path);
+        //.	pWnd->SetStretchTexture( stretch_flag );
+    }
 
     Fvector2 pos, size;
     pos.x = xml_doc.ReadAttribFlt(path, index, "x");
@@ -804,8 +814,8 @@ bool CUIXmlInitBase::InitFrameLine(CUIXml& xml_doc, LPCSTR path, int index, CUIF
     pWnd->SetTextureColor(color);
 
     InitWindow(xml_doc, path, index, pWnd);
-    pWnd->InitFrameLineWnd(*base_name, pos, size, !vertical);
-    return true;
+    
+    return pWnd->InitFrameLineWnd(*base_name, pos, size, !vertical, fatal);
 }
 
 bool CUIXmlInitBase::InitCustomEdit(CUIXml& xml_doc, LPCSTR path, int index, CUICustomEdit* pWnd, bool fatal /*= true*/)
@@ -886,8 +896,10 @@ bool CUIXmlInitBase::InitAnimatedStatic(CUIXml& xml_doc, LPCSTR path, int index,
     return true;
 }
 
-bool CUIXmlInitBase::InitTexture(CUIXml& xml_doc, LPCSTR path, int index, ITextureOwner* pWnd)
+bool CUIXmlInitBase::InitTexture(CUIXml& xml_doc, LPCSTR path, int index, ITextureOwner* pWnd, bool fatal /*= true*/)
 {
+    bool result = true;
+
     string256 buf;
     LPCSTR texture = NULL;
     LPCSTR shader = NULL;
@@ -900,9 +912,9 @@ bool CUIXmlInitBase::InitTexture(CUIXml& xml_doc, LPCSTR path, int index, ITextu
     if (texture)
     {
         if (shader)
-            pWnd->InitTextureEx(texture, shader);
+            result = pWnd->InitTextureEx(texture, shader, fatal);
         else
-            pWnd->InitTexture(texture);
+            result = pWnd->InitTexture(texture, fatal);
     }
     //--------------------
     Frect rect;
@@ -920,7 +932,7 @@ bool CUIXmlInitBase::InitTexture(CUIXml& xml_doc, LPCSTR path, int index, ITextu
     if (rect.width() != 0 && rect.height() != 0)
         pWnd->SetTextureRect(rect);
 
-    return true;
+    return result;
 }
 
 bool CUIXmlInitBase::InitTextureOffset(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd)
@@ -1142,6 +1154,63 @@ bool CUIXmlInitBase::InitScrollView(CUIXml& xml_doc, LPCSTR path, int index, CUI
         pWnd->AddWindow(newText, true);
     }
     xml_doc.SetLocalRoot(_stored_root);
+    return true;
+}
+
+bool CUIXmlInitBase::InitListWnd(CUIXml& xml_doc, pcstr path, int index, CUIListWnd* pWnd, bool fatal /*= true*/)
+{
+    const bool nodeExist = xml_doc.NavigateToNode(path, index);
+    if (!nodeExist)
+    {
+        R_ASSERT4(!fatal, "XML node not found", path, xml_doc.m_xml_file_name);
+        return false;
+    }
+
+    Fvector2 pos, size;
+    pos.x = xml_doc.ReadAttribFlt(path, index, "x");
+    pos.y = xml_doc.ReadAttribFlt(path, index, "y");
+
+    InitAlignment(xml_doc, path, index, pos.x, pos.y, pWnd);
+
+    size.x = xml_doc.ReadAttribFlt(path, index, "width");
+    size.y = xml_doc.ReadAttribFlt(path, index, "height");
+    float item_height = xml_doc.ReadAttribFlt(path, index, "item_height");
+    int active_background = xml_doc.ReadAttribInt(path, index, "active_bg");
+
+    // Init font from xml config file
+    string256 buf;
+    CGameFont* LocalFont = nullptr;
+    u32 cl;
+
+    shared_str text_path = strconcat(sizeof(buf), buf, path, ":font");
+    InitFont(xml_doc, *text_path, index, cl, LocalFont);
+    if (LocalFont)
+    {
+        pWnd->SetFont(LocalFont);
+        pWnd->SetTextColor(cl);
+    }
+
+    pWnd->SetScrollBarProfile(xml_doc.ReadAttrib(path, index, "scroll_profile", "default"));
+    pWnd->InitListWnd(pos, size, item_height);
+    pWnd->EnableActiveBackground(!!active_background);
+
+    if (xml_doc.ReadAttribInt(path, index, "always_show_scroll"))
+    {
+        pWnd->SetAlwaysShowScroll(true);
+        pWnd->EnableAlwaysShowScroll(true);
+        pWnd->EnableScrollBar(true);
+    }
+
+    if (xml_doc.ReadAttribInt(path, index, "always_hide_scroll"))
+    {
+        pWnd->SetAlwaysShowScroll(false);
+        pWnd->EnableAlwaysShowScroll(true);
+    }
+
+
+    bool bVertFlip = (1 == xml_doc.ReadAttribInt(path, index, "flip_vert", 0));
+    pWnd->SetVertFlip(bVertFlip);
+
     return true;
 }
 

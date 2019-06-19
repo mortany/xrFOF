@@ -128,6 +128,11 @@ void _give_news(LPCSTR caption, LPCSTR text, LPCSTR texture_name, int delay, int
         Actor()->AddGameNews_deffered(news_data, delay);
 }
 
+void CScriptGameObject::ClearGameNews() const
+{
+    Actor()->ClearGameNews();
+}
+
 bool CScriptGameObject::HasInfo(LPCSTR info_id)
 {
     CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
@@ -1242,7 +1247,12 @@ void CScriptGameObject::SetActiveTask(CGameTask* t)
 bool CScriptGameObject::IsActiveTask(CGameTask* t)
 {
     VERIFY(t);
-    return Level().GameTaskManager().ActiveTask() == t;
+
+    const auto t1 = Level().GameTaskManager().ActiveTask(eTaskTypeStoryline);
+    const auto t2 = Level().GameTaskManager().ActiveTask(eTaskTypeAdditional);
+    const auto t3 = Level().GameTaskManager().ActiveTask(eTaskTypeInsignificant);
+
+    return t == t1 || t == t2 || t == t3;
 }
 
 u32 CScriptGameObject::active_slot()

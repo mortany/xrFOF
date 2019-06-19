@@ -90,7 +90,14 @@ static Fbox bbCrouchBox;
 static Fvector vFootCenter;
 static Fvector vFootExt;
 
-Flags32 psActorFlags = {AF_GODMODE_RT | AF_AUTOPICKUP | AF_RUN_BACKWARD | AF_IMPORTANT_SAVE};
+Flags32 psActorFlags =
+{
+    AF_GODMODE_RT |
+    AF_AUTOPICKUP | 
+    AF_RUN_BACKWARD | 
+    AF_IMPORTANT_SAVE |
+    AF_MULTI_ITEM_PICKUP
+};
 int psActorSleepTime = 1;
 
 CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
@@ -942,15 +949,21 @@ void CActor::UpdateCL()
 {
     if (g_Alive() && Level().CurrentViewEntity() == this)
     {
-        if (CurrentGameUI() && NULL == CurrentGameUI()->TopInputReceiver())
+        if (CurrentGameUI() && !CurrentGameUI()->TopInputReceiver() && !m_holder)
         {
-            int dik = get_action_dik(kUSE, 0);
-            if (dik && pInput->iGetAsyncKeyState(dik))
+            const bool allowed = psActorFlags.test(AF_MULTI_ITEM_PICKUP);
+
+            auto dik = get_action_dik(kUSE, 0);
+            if (dik && pInput->iGetAsyncKeyState(dik) && allowed)
                 m_bPickupMode = true;
 
             dik = get_action_dik(kUSE, 1);
-            if (dik && pInput->iGetAsyncKeyState(dik))
+            if (dik && pInput->iGetAsyncKeyState(dik) && allowed)
                 m_bPickupMode = true;
+        }
+        else
+        {
+            m_bPickupMode = false;
         }
     }
 
@@ -1086,7 +1099,8 @@ void CActor::UpdateCL()
     if (IsFocused())
         g_player_hud->update(trans);
 
-    m_bPickupMode = false;
+    if (psActorFlags.test(AF_MULTI_ITEM_PICKUP))
+        m_bPickupMode = false;
 }
 
 float NET_Jump = 0;
@@ -1604,6 +1618,9 @@ void CActor::ForceTransform(const Fmatrix& m)
     // character_physics_support()->set_movement_position( m.c );
     // character_physics_support()->movement()->SetVelocity( 0, 0, 0 );
 
+    Fvector xyz;
+    m.getHPB(xyz);
+    cam_Active()->Set(-xyz.x, -xyz.y, -xyz.z);
     character_physics_support()->ForceTransform(m);
     const float block_damage_time_seconds = 2.f;
     if (!IsGameTypeSingle())

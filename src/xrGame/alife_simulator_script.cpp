@@ -49,7 +49,7 @@ CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, LPCSTR name)
     VERIFY(self);
 
     for (CALifeObjectRegistry::OBJECT_REGISTRY::const_iterator it = self->objects().objects().begin();
-         it != self->objects().objects().end(); it++)
+         it != self->objects().objects().end(); ++it)
     {
         CSE_ALifeDynamicObject* obj = it->second;
         if (xr_strcmp(obj->name_replace(), name) == 0)
@@ -312,6 +312,17 @@ void teleport_object(CALifeSimulator* alife, ALife::_OBJECT_ID id, GameGraph::_G
 }
 //-Alundaio
 
+void iterate_objects(const CALifeSimulator* self, luabind::functor<bool> functor)
+{
+    THROW(self);
+    for (const auto& it : self->objects().objects())
+    {
+        CSE_ALifeDynamicObject* obj = it.second;
+        if (functor(obj))
+            return;
+    }
+}
+
 SCRIPT_EXPORT(CALifeSimulator, (),
 {
     module(luaState)
@@ -357,8 +368,9 @@ SCRIPT_EXPORT(CALifeSimulator, (),
             .def("set_switch_distance", (void (CALifeSimulator::*)(float))
                (&CALifeSimulator::set_switch_distance)) //Alundaio: renamed to set_switch_distance from switch_distance
             //Alundaio: extend alife simulator exports
-            .def("teleport_object", &teleport_object),
+            .def("teleport_object", &teleport_object)
             //Alundaio: END
+            .def("iterate_objects", &iterate_objects),
 
         def("alife", &alife)
     ];

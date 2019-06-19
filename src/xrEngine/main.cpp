@@ -28,6 +28,7 @@
 #include "xrSASH.h"
 #endif
 #include "xr_ioc_cmd.h"
+#include "MonitorManager.hpp"
 
 #ifdef MASTER_GOLD
 #define NO_MULTI_INSTANCES
@@ -41,6 +42,10 @@ ENGINE_API string512 g_sLaunchOnExit_params;
 ENGINE_API string512 g_sLaunchOnExit_app;
 ENGINE_API string_path g_sLaunchWorkingFolder;
 
+ENGINE_API bool CallOfPripyatMode = false;
+ENGINE_API bool ClearSkyMode = false;
+ENGINE_API bool ShadowOfChernobylMode = false;
+
 namespace
 {
 bool CheckBenchmark();
@@ -51,6 +56,8 @@ ENGINE_API void InitEngine()
 {
     Engine.Initialize();
     Device.Initialize();
+
+    Console->OnDeviceInitialize();
 }
 
 namespace
@@ -97,6 +104,33 @@ ENGINE_API void InitSettings()
     InitConfig(pSettingsAuth, "system.ltx", true, true, true, false, 0, includeFilter);
     InitConfig(pSettingsOpenXRay, "openxray.ltx", false, true, true, false);
     InitConfig(pGameIni, "game.ltx");
+
+    pcstr gameMode = READ_IF_EXISTS(pSettingsOpenXRay, r_string, "compatibility", "game_mode", "cop");
+
+    if (xr_strcmpi("cop", gameMode) == 0)
+    {
+        CallOfPripyatMode = true;
+        ShadowOfChernobylMode = false;
+        ClearSkyMode = false;
+    }
+    else if (xr_strcmpi("cs", gameMode) == 0)
+    {
+        CallOfPripyatMode = false;
+        ShadowOfChernobylMode = false;
+        ClearSkyMode = true;
+    }
+    else if (xr_strcmpi("shoc", gameMode) == 0 || xr_strcmpi("soc", gameMode) == 0)
+    {
+        CallOfPripyatMode = false;
+        ShadowOfChernobylMode = true;
+        ClearSkyMode = false;
+    }
+    else if (xr_strcmpi("unlock", gameMode) == 0)
+    {
+        CallOfPripyatMode = false;
+        ShadowOfChernobylMode = false;
+        ClearSkyMode = false;
+    }
 }
 
 ENGINE_API void InitConsole()
@@ -159,6 +193,36 @@ void execUserScript()
 {
     Console->Execute("default_controls");
     Console->ExecuteScript(Console->ConfigFile);
+}
+
+void CheckAndSetupRenderer()
+{
+    if (GEnv.isDedicatedServer)
+    {
+        Console->Execute("renderer renderer_r1");
+        return;
+    }
+
+    if (strstr(Core.Params, "-gl"))
+        Console->Execute("renderer renderer_gl");
+    else if (strstr(Core.Params, "-r4"))
+        Console->Execute("renderer renderer_r4");
+    else if (strstr(Core.Params, "-r3"))
+        Console->Execute("renderer renderer_r3");
+    else if (strstr(Core.Params, "-r2.5"))
+        Console->Execute("renderer renderer_r2.5");
+    else if (strstr(Core.Params, "-r2a"))
+        Console->Execute("renderer renderer_r2a");
+    else if (strstr(Core.Params, "-r2"))
+        Console->Execute("renderer renderer_r2");
+    else if (strstr(Core.Params, "-r1"))
+        Console->Execute("renderer renderer_r1");
+    else
+    {
+        CCC_LoadCFG_custom cmd("renderer ");
+        cmd.Execute(Console->ConfigFile);
+        renderer_allow_override = true;
+    }
 }
 
 void slowdownthread(void*)
@@ -229,6 +293,7 @@ ENGINE_API void Startup()
     else
         Console->Destroy();
 #endif
+    g_monitors.Destroy();
     destroyEngine();
     destroySound();
 }
@@ -262,43 +327,21 @@ ENGINE_API int RunApplication()
         xr_strcpy(Core.CompName, sizeof(Core.CompName), "Computer");
     }
 
-    Engine.External.CreateRendererList();
-
     FPU::m24r();
-    InitEngine();
+
+    g_monitors.Initialize();
     InitInput();
     InitConsole();
+
+    Engine.External.CreateRendererList();
+    CheckAndSetupRenderer();
+
+    Engine.External.Initialize();
+    InitEngine();
 
     if (CheckBenchmark())
         return 0;
 
-    if (!GEnv.isDedicatedServer)
-    {
-        if (strstr(Core.Params, "-gl"))
-            Console->Execute("renderer renderer_gl");
-        else if (strstr(Core.Params, "-r4"))
-            Console->Execute("renderer renderer_r4");
-        else if (strstr(Core.Params, "-r3"))
-            Console->Execute("renderer renderer_r3");
-        else if (strstr(Core.Params, "-r2.5"))
-            Console->Execute("renderer renderer_r2.5");
-        else if (strstr(Core.Params, "-r2a"))
-            Console->Execute("renderer renderer_r2a");
-        else if (strstr(Core.Params, "-r2"))
-            Console->Execute("renderer renderer_r2");
-        else if (strstr(Core.Params, "-r1"))
-            Console->Execute("renderer renderer_r1");
-        else
-        {
-            CCC_LoadCFG_custom cmd("renderer ");
-            cmd.Execute(Console->ConfigFile);
-            renderer_allow_override = true;
-        }
-    }
-    else
-        Console->Execute("renderer renderer_r1");
-
-    Engine.External.Initialize();
     Startup();
     // check for need to execute something external
     if (/*xr_strlen(g_sLaunchOnExit_params) && */ xr_strlen(g_sLaunchOnExit_app))
@@ -323,7 +366,7 @@ bool CheckBenchmark()
     pcstr benchName = "-batch_benchmark ";
     if (strstr(Core.Params, benchName))
     {
-        const u32 sz = xr_strlen(benchName);
+        const size_t sz = xr_strlen(benchName);
         string64 benchmarkName;
         sscanf(strstr(Core.Params, benchName) + sz, "%[^ ] ", benchmarkName);
         RunBenchmark(benchmarkName);
@@ -333,7 +376,7 @@ bool CheckBenchmark()
     pcstr sashName = "-openautomate ";
     if (strstr(Core.Params, sashName))
     {
-        const u32 sz = xr_strlen(sashName);
+        const size_t sz = xr_strlen(sashName);
         string512 sashArg;
         sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
 #if !defined(LINUX)
@@ -352,6 +395,7 @@ void RunBenchmark(pcstr name)
     FS.update_path(cfgPath, "$app_data_root$", name);
     CInifile ini(cfgPath);
     const u32 benchmarkCount = ini.line_count("benchmark");
+    const size_t hyphenLtxLen = xr_strlen("-ltx ");
     for (u32 i = 0; i < benchmarkCount; i++)
     {
         LPCSTR benchmarkName, t;
@@ -363,14 +407,14 @@ void RunBenchmark(pcstr name)
         xr_strcpy(Core.Params, cmdSize, benchmarkCommand.c_str());
         xr_strlwr(Core.Params);
         InitInput();
+        Engine.External.Initialize();
         if (i)
             InitEngine();
-        Engine.External.Initialize();
         xr_strcpy(Console->ConfigFile, "user.ltx");
         if (strstr(Core.Params, "-ltx "))
         {
             string64 cfgName;
-            sscanf(strstr(Core.Params, "-ltx ") + strlen("-ltx "), "%[^ ] ", cfgName);
+            sscanf(strstr(Core.Params, "-ltx ") + hyphenLtxLen, "%[^ ] ", cfgName);
             xr_strcpy(Console->ConfigFile, cfgName);
         }
         Startup();
