@@ -370,6 +370,7 @@ public:
 
     virtual void ChangeMark(pcstr mark) = 0;
 
+
     virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = 0) = 0;
     virtual void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer) = 0;
     virtual void ScreenshotAsyncBegin() = 0;

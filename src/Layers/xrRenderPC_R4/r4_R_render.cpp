@@ -577,6 +577,8 @@ void CRender::ChangeMark(pcstr mark)
     tmp.create(mark);
 
     Target->rt_scope_mark->surface_set(tmp->surface_get());
+
+    tmp.destroy();
 }
 
 // После рендера мира и пост-эффектов --#SM+#-- +SecondVP+

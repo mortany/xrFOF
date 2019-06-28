@@ -169,7 +169,12 @@ void CRender::ChangeMark(pcstr mark)
     ref_texture tmp;
     tmp.create(mark);
 
+    //if (Target->RT_scope_mark->surface_get() == tmp->surface_get())
+        //return;
+
     Target->RT_scope_mark->surface_set(tmp->surface_get());
+
+    tmp.destroy();
 }
 
 // Перед началом рендера мира --#SM+#-- +SecondVP+

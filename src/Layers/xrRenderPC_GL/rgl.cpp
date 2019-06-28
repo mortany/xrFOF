@@ -465,10 +465,12 @@ void CRender::OnFrame()
 
 void CRender::ChangeMark(pcstr mark)
 {
-    ref_texture tmp;
-    tmp.create(mark);
+    //ref_texture tmp;
+    //tmp.create(mark);
 
-    Target->rt_scope_mark->surface_set(tmp->surface_get());
+    //Target->rt_scope_mark->surface_set(tmp->surface_get());
+
+    //tmp.destroy();
 }
 
 

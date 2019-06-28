@@ -1193,6 +1193,8 @@ void CWeapon::UpdateMark()
 
     //CActor* pActor = H_Parent()->cast_actor();
 
+
+
     if (!marks.empty())
         ChangeCurrentMark(marks[current_mark].c_str());
     else
