@@ -463,6 +463,15 @@ void CRender::OnFrame()
     }
 }
 
+void CRender::ChangeMark(pcstr mark)
+{
+    ref_texture tmp;
+    tmp.create(mark);
+
+    Target->rt_scope_mark->surface_set(tmp->surface_get());
+}
+
+
 void CRender::BeforeWorldRender() {}
 void CRender::AfterWorldRender() {}
 

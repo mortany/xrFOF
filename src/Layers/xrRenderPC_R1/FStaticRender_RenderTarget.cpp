@@ -6,6 +6,7 @@ static LPCSTR RTname = "$user$rendertarget";
 static LPCSTR RTname_color_map = "$user$rendertarget_color_map";
 static LPCSTR RTname_distort = "$user$distort";
 static LPCSTR RTname_SecondVP = "$user$viewport2"; //--#SM+#-- +SecondVP+
+static LPCSTR RTname_scope_mark = "$user$scope_mark";
 
 CRenderTarget::CRenderTarget()
 {
@@ -16,6 +17,8 @@ CRenderTarget::CRenderTarget()
     pTempZB = nullptr;
     ZB = nullptr;
     pFB = nullptr;
+
+    RT_scope_mark = nullptr;
 
     param_blur = 0.f;
     param_gray = 0.f;
@@ -68,6 +71,8 @@ BOOL CRenderTarget::Create()
 
     RT_SecondVP.create(RTname_SecondVP, rtWidth, rtHeight, HW.Caps.fTarget); //--#SM+#-- +SecondVP+
 
+    RT_scope_mark.create(RTname_scope_mark);
+
     if ((rtHeight != Device.dwHeight) || (rtWidth != Device.dwWidth))
     {
         R_CHK(HW.pDevice->CreateDepthStencilSurface(
@@ -118,6 +123,7 @@ CRenderTarget::~CRenderTarget()
     RT_SecondVP.destroy(); //--#SM+#-- +SecondVP+
     RT_distort.destroy();
     RT_color_map.destroy();
+    RT_scope_mark.destroy();
     RT.destroy();
 }
 

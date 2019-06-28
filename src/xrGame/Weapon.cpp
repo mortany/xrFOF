@@ -80,11 +80,13 @@ CWeapon::CWeapon()
     m_crosshair_inertion = 0.f;
     m_activation_speed_is_overriden = false;
     m_cur_scope = 0;
+    current_mark = 0;
     m_bRememberActorNVisnStatus = false;
 
     UseAltScope = false;
     ScopeIsHasTexture = false;
     bScopeIsLoaded = false;
+    bMarkIsLoaded = false;
     m_nearwall_last_hud_fov = psHUD_FOV_def;
     m_zoom_params.m_fSecondVPFovFactor = 0.0f;
 }
@@ -93,6 +95,7 @@ CWeapon::~CWeapon()
 {
     xr_delete(m_UIScope);
     delete_data(m_scopes);
+    delete_data(marks);
 }
 
 const shared_str CWeapon::GetScopeName() const
@@ -332,6 +335,18 @@ void CWeapon::ForceUpdateFireParticles()
 
         m_current_firedeps.m_FireParticlesXForm.set(_pxf);
     }
+}
+
+void CWeapon::LoadDefaultMark()
+{
+    shared_str mark = READ_IF_EXISTS(pSettings, r_string, GetScopeName().c_str(), "mark1", "wpn\\wpn_addon_scope_red_dot");
+
+    GEnv.Render->ChangeMark(mark.c_str());
+}
+
+void CWeapon::ChangeCurrentMark(pcstr mark)
+{
+    GEnv.Render->ChangeMark(mark);
 }
 
 void CWeapon::LoadMODParams(pcstr section)
@@ -638,6 +653,34 @@ bool CWeapon::LoadScopeTexture(LPCSTR section)
     return CUIXmlInit::InitWindow(*pWpnScopeXml, scope_tex_name, 0, m_UIScope);
 }
 
+bool CWeapon::LoadMarks(pcstr section)
+{
+    if (!marks.empty())
+        marks.clear();
+
+	// В данный момент количество марок зашито в движок - не более 10
+
+    if (!pSettings->line_exist(section, "mark1"))
+        return false;
+
+    LPCSTR str = pSettings->r_string(section, "mark1");
+    marks.push_back(str);
+
+    for (int i = 2; i <= 10; i++)
+    {
+        string16 it = "mark";
+        xr_sprintf(it,"%s%d", it, i);
+
+        if (pSettings->line_exist(section, it))
+        {
+            str = pSettings->r_string(section, it);
+            marks.push_back(str);
+        }
+    }
+
+    return true;
+}
+
 bool CWeapon::LoadNewScopes(LPCSTR section)
 {
     if (!pSettings->line_exist(section, "scopes"))
@@ -719,9 +762,15 @@ BOOL CWeapon::net_Spawn(CSE_Abstract* DC)
         }
     }
 
+
     UpdateAltScope();
     UpdateAddonsVisibility();
     InitAddons();
+
+    if (IsScopeAttached() && !ScopeIsHasTexture && !bMarkIsLoaded)
+    {
+        LoadDefaultMark();
+    }
 
     m_dwWeaponIndependencyTime = 0;
 
@@ -833,6 +882,7 @@ void CWeapon::save(NET_Packet& output_packet)
     save_data(m_ammoType, output_packet);
     save_data(m_zoom_params.m_bIsZoomModeNow, output_packet);
     save_data(m_bRememberActorNVisnStatus, output_packet);
+    save_data(current_mark, output_packet);
 }
 
 void CWeapon::load(IReader& input_packet)
@@ -852,6 +902,17 @@ void CWeapon::load(IReader& input_packet)
         OnZoomOut();
 
     load_data(m_bRememberActorNVisnStatus, input_packet);
+
+    u8 temp;
+
+    load_data(temp, input_packet);
+
+    if (temp >= marks.size() && !marks.empty())
+        current_mark = 0;
+    else
+        current_mark = temp;
+
+    bMarkIsLoaded = true;
 }
 
 void CWeapon::OnEvent(NET_Packet& P, u16 type)
@@ -1082,12 +1143,60 @@ void CWeapon::UpdateSecondVP()
 
     CActor* pActor = H_Parent()->cast_actor();
 
-    bool bCond_1 = m_zoom_params.m_fZoomRotationFactor > 0.05f; // Мы должны целиться
+    bool bCond_1 = bInZoomRightNow(); // Мы должны целиться
     bool bCond_2 = IsSecondVPZoomPresent(); // В конфиге должен быть прописан фактор зума для линзы (scope_lense_factor
                                             // больше чем 0)
     bool bCond_3 = pActor->cam_Active() == pActor->cam_FirstEye(); // Мы должны быть от 1-го лица
 
     Device.m_SecondViewport.SetSVPActive(bCond_1 && bCond_2 && bCond_3);
+}
+
+bool CWeapon::bInZoomRightNow()
+{
+   return m_zoom_params.m_fZoomRotationFactor > 0.05f;
+}
+
+
+void CWeapon::ChangeNextMark()
+{
+    if (marks.empty())
+        return;
+
+    if (current_mark < marks.size() - 1)
+        ++current_mark;
+    else
+        current_mark = 0;
+}
+
+void CWeapon::ChangePrevMark()
+{
+    if (marks.empty())
+        return;
+
+    if (current_mark > 0)
+        --current_mark;
+    else if (current_mark == 0 && marks.size() > 1)
+        current_mark = marks.size() - 1;
+}
+
+void CWeapon::UpdateMark()
+{
+    bool b_is_active_item = (m_pInventory != NULL) && (m_pInventory->ActiveItem() == this);
+
+    if (!b_is_active_item)
+        return;
+
+    //R_ASSERT(ParentIsActor() && b_is_active_item); // Эта функция должна вызываться только для оружия в руках нашего игрока
+
+    if (!IsScopeAttached() || ScopeIsHasTexture)
+        return;
+
+    //CActor* pActor = H_Parent()->cast_actor();
+
+    if (!marks.empty())
+        ChangeCurrentMark(marks[current_mark].c_str());
+    else
+        LoadDefaultMark();
 }
 
 bool CWeapon::need_renderable()

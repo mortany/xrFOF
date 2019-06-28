@@ -365,6 +365,8 @@ public:
     void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) override;
     void OnFrame() override;
 
+    void ChangeMark(pcstr mark) override;
+
     void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Procedure is called before world render and post-effects
     void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Procedure is called after world render and before UI
 

@@ -1033,11 +1033,16 @@ void CActor::UpdateCL()
             psHUD_Flags.set(HUD_DRAW_RT, pWeapon->show_indicators());
 
             // Обновляем двойной рендер от оружия [Update SecondVP with weapon data]
+            pWeapon->UpdateMark();
             pWeapon->UpdateSecondVP(); //--#SM+#-- +SecondVP+
 
             // Обновляем информацию об оружии в шейдерах
             g_pGamePersistent->m_pGShaderConstants->hud_params.x = pWeapon->GetZRotatingFactor(); //--#SM+#--
             g_pGamePersistent->m_pGShaderConstants->hud_params.y = pWeapon->GetSecondVPFov(); //--#SM+#--
+
+            float x = pWeapon->bInZoomRightNow() ? 1.0f : 0.0f;
+
+            g_pGamePersistent->m_pGShaderConstants->collimator_mark.x = x;
         }
     }
     else
@@ -1049,6 +1054,8 @@ void CActor::UpdateCL()
 
             // Очищаем информацию об оружии в шейдерах
             g_pGamePersistent->m_pGShaderConstants->hud_params.set(0.f, 0.f, 0.f, 0.f); //--#SM+#--
+            g_pGamePersistent->m_pGShaderConstants->collimator_mark.set(0.f, 0.f, 0.f, 0.f); // Kr't0ki
+
 
             // Отключаем второй вьюпорт [Turn off SecondVP]
             // CWeapon::UpdateSecondVP();

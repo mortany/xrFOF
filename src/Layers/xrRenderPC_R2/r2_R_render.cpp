@@ -514,6 +514,14 @@ void CRender::render_forward()
     RImplementation.o.distortion = FALSE; // disable distorion
 }
 
+void CRender::ChangeMark(pcstr mark)
+{
+    ref_texture tmp;
+    tmp.create(mark);
+
+    Target->rt_scope_mark->surface_set(tmp->surface_get());
+}
+
 // Перед началом рендера мира --#SM+#-- +SecondVP+
 void CRender::BeforeWorldRender() {}
 

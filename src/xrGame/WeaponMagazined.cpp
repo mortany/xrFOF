@@ -1090,6 +1090,7 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item)
             return true;
         }
         m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonScope;
+        current_mark = 0;
         UpdateAltScope();
         UpdateAddonsVisibility();
         InitAddons();
@@ -1157,6 +1158,13 @@ void CWeaponMagazined::InitAddons()
                     m_zoom_params.m_sUseBinocularVision =
                         READ_IF_EXISTS(pSettings, r_string, GetScopeName(), "scope_alive_detector", 0);
                 }
+                else
+                {
+                    bool bHasCoustomMark = LoadMarks(GetScopeName().c_str());
+
+                    if (!bHasCoustomMark)
+                        LoadDefaultMark();
+                }
             }
         }
         else if (m_eScopeStatus == ALife::eAddonPermanent)
@@ -1174,6 +1182,13 @@ void CWeaponMagazined::InitAddons()
                         READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "scope_dynamic_zoom", false);
                     m_zoom_params.m_sUseBinocularVision =
                         READ_IF_EXISTS(pSettings, r_string, cNameSect(), "scope_alive_detector", 0);
+                }
+                else
+                {
+                    bool bHasCoustomMark = LoadMarks(GetScopeName().c_str());
+
+                    if (!bHasCoustomMark)
+                        LoadDefaultMark();
                 }
             }
         }

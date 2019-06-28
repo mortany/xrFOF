@@ -72,6 +72,8 @@ public:
     ref_rt rt_Normal; // 64bit,	fat	(x,y,z,hemi)			(eye-space)
     ref_rt rt_Color; // 64/32bit,fat	(r,g,b,specular-gloss)	(or decompressed MET-8-8-8-8)
 
+    ref_texture rt_scope_mark;
+
     // 
     ref_rt rt_Accumulator; // 64bit		(r,g,b,specular)
     ref_rt rt_Accumulator_temp;// only for HW which doesn't feature fp16 blend

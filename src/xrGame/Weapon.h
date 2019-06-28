@@ -74,6 +74,27 @@ public:
     void LoadOriginalScopes(LPCSTR section);
     bool LoadScopeTexture(LPCSTR section);
     bool bScopeIsLoaded;
+    bool bMarkIsLoaded;
+
+	//Отвечает за замену прицельной марки коллиматора через особый шейдер
+    u8 current_mark;
+
+	// Контролер переключения маркера
+    void ChangeNextMark();
+    void ChangePrevMark();
+
+	// Дефотные параметры и обновлениме марки
+    bool LoadMarks(pcstr section);
+    void UpdateMark();
+    void ChangeCurrentMark(pcstr mark);
+    void LoadDefaultMark();
+
+    bool bInZoomRightNow();
+
+	// Хранилище
+    
+    using SCOPES_VECTOR = xr_vector<shared_str>;
+    SCOPES_VECTOR marks;
 
     //Второй рендер
     float CWeapon::GetSecondVPFov() const;
@@ -489,7 +510,6 @@ public:
         u8						cur_scope;
     */
 
-    using SCOPES_VECTOR = xr_vector<shared_str>;
     SCOPES_VECTOR m_scopes;
     u8 m_cur_scope;
 

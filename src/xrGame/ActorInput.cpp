@@ -50,6 +50,23 @@ void CActor::IR_OnKeyboardPress(int cmd)
     if (load_screen_renderer.IsActive())
         return;
 
+    if (pInput->iGetAsyncKeyState(SDL_SCANCODE_PAGEUP))
+    {
+        CWeapon* pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem());
+
+        if (pWeapon)
+            pWeapon->ChangeNextMark();
+    }
+
+
+    if (pInput->iGetAsyncKeyState(SDL_SCANCODE_PAGEDOWN))
+    {
+        CWeapon* pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem());
+
+        if (pWeapon)
+            pWeapon->ChangePrevMark();
+    }
+        
     switch (cmd)
     {
     case kWPN_FIRE:

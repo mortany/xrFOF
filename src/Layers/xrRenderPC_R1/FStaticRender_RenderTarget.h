@@ -7,6 +7,8 @@ class CRenderTarget : public IRender_Target
 public:
     ref_rt RT_SecondVP; //--#SM+#-- +SecondVP+
 
+    ref_texture RT_scope_mark;
+
 private:
     BOOL bAvailable;
     u32 rtWidth;

@@ -571,6 +571,14 @@ void CRender::render_forward()
 // Перед началом рендера мира --#SM+#-- +SecondVP+
 void CRender::BeforeWorldRender() {}
 
+void CRender::ChangeMark(pcstr mark)
+{
+    ref_texture tmp;
+    tmp.create(mark);
+
+    Target->rt_scope_mark->surface_set(tmp->surface_get());
+}
+
 // После рендера мира и пост-эффектов --#SM+#-- +SecondVP+
 void CRender::AfterWorldRender()
 {
