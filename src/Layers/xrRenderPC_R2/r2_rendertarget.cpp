@@ -220,6 +220,8 @@ CRenderTarget::CRenderTarget()
     b_luminance = new CBlender_luminance();
     b_combine = new CBlender_combine();
 
+    m_MarkTexture = nullptr;
+
     //FXAA
     b_fxaa = new CBlender_FXAA();
 

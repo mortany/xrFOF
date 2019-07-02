@@ -9,6 +9,8 @@ public:
 
     ref_texture RT_scope_mark;
 
+	shared_str m_MarkTexture;
+
 private:
     BOOL bAvailable;
     u32 rtWidth;

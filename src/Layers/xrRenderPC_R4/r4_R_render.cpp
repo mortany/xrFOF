@@ -573,6 +573,10 @@ void CRender::BeforeWorldRender() {}
 
 void CRender::ChangeMark(pcstr mark)
 {
+    if (0 == xr_strcmp(Target->m_MarkTexture.c_str(), mark)) return;
+
+    Target->m_MarkTexture._set(mark);
+
     ref_texture tmp;
     tmp.create(mark);
 

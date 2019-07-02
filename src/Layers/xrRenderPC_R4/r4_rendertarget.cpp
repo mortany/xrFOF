@@ -323,6 +323,8 @@ CRenderTarget::CRenderTarget()
     b_combine = new CBlender_combine();
     b_ssao = new CBlender_SSAO_noMSAA();
 
+    m_MarkTexture = nullptr;
+
     //FXAA
     b_fxaa = new CBlender_FXAA();
 

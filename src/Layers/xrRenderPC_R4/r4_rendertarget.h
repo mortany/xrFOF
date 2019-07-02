@@ -77,6 +77,7 @@ public:
     ref_rt rt_Color; // 64/32bit,fat	(r,g,b,specular-gloss)	(or decompressed MET-8-8-8-8)
 
     ref_texture rt_scope_mark;
+    shared_str m_MarkTexture;
 
     //
     ref_rt rt_Accumulator; // 64bit		(r,g,b,specular)
