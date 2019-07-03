@@ -83,8 +83,8 @@ CWeapon::CWeapon()
     current_mark = 0;
     m_bRememberActorNVisnStatus = false;
 
-    UseAltScope = false;
-    ScopeIsHasTexture = false;
+    bUseAltScope = false;
+    bScopeHasTexture = false;
     bScopeIsLoaded = false;
     bMarkIsLoaded = false;
     m_nearwall_last_hud_fov = psHUD_FOV_def;
@@ -100,28 +100,17 @@ CWeapon::~CWeapon()
 
 const shared_str CWeapon::GetScopeName() const
 {
-    if (UseAltScope)
-    {
-        return m_scopes[m_cur_scope];
-    }
-    else
-    {
-        return pSettings->r_string(m_scopes[m_cur_scope], "scope_name");
-    }
+    return bUseAltScope ? m_scopes[m_cur_scope].c_str() : pSettings->r_string(m_scopes[m_cur_scope].c_str(), "scope_name");
 }
 
 int CWeapon::GetScopeX()
 {
-    if (UseAltScope)
+    if (bUseAltScope)
     {
         if (m_eScopeStatus != ALife::eAddonPermanent && IsScopeAttached())
-        {
             return pSettings->r_s32(GetNameWithAttachment(), "scope_x");
-        }
         else
-        {
             return 0;
-        }
     }
     else
     {
@@ -131,16 +120,12 @@ int CWeapon::GetScopeX()
 
 int CWeapon::GetScopeY()
 {
-    if (UseAltScope)
+    if (bUseAltScope)
     {
         if (m_eScopeStatus != ALife::eAddonPermanent && IsScopeAttached())
-        {
             return pSettings->r_s32(GetNameWithAttachment(), "scope_y");
-        }
         else
-        {
             return 0;
-        }
     }
     else
     {
@@ -169,7 +154,7 @@ void CWeapon::UpdateAltScope()
     {
         shared_str sectionNeedLoad;
 
-        if (!UseAltScope)
+        if (!bUseAltScope)
             return;
 
         if (IsScopeAttached())
@@ -546,9 +531,9 @@ void CWeapon::Load(LPCSTR section)
 	// Mortan: все новые фишки стоит добавлять внутрь фукнции
     LoadMODParams(section);
 
-    UseAltScope = LoadNewScopes(section);
+    bUseAltScope = LoadNewScopes(section);
 
-    if (!UseAltScope)
+    if (!bUseAltScope)
         LoadOriginalScopes(section);
 
     if (m_eSilencerStatus == ALife::eAddonAttachable)
@@ -663,46 +648,43 @@ bool CWeapon::LoadMarks(pcstr section)
     if (!pSettings->line_exist(section, "mark1"))
         return false;
 
-    LPCSTR str = pSettings->r_string(section, "mark1");
-    marks.push_back(str);
+    shared_str mark = pSettings->r_string(section, "mark1");
+    marks.push_back(mark);
 
-    for (int i = 2; i <= 10; i++)
+    for (size_t i = 2; i <= 10; i++)
     {
         string16 it = "mark";
         xr_sprintf(it,"%s%d", it, i);
 
         if (pSettings->line_exist(section, it))
         {
-            str = pSettings->r_string(section, it);
-            marks.push_back(str);
+            mark = pSettings->r_string(section, it);
+            marks.push_back(mark);
         }
+        else break;
     }
-
     return true;
 }
 
 bool CWeapon::LoadNewScopes(LPCSTR section)
 {
+    if(m_eScopeStatus != ALife::eAddonAttachable)
+        return false;
+
     if (!pSettings->line_exist(section, "scopes"))
         return false;
 
     if (strcmp(pSettings->r_string(section, "scopes"), "none") == 0)
         return false;
-
-    if (m_eScopeStatus == ALife::eAddonAttachable)
+    
+    LPCSTR str = pSettings->r_string(section, "scopes");
+    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
     {
-        LPCSTR str = pSettings->r_string(section, "scopes");
-        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-        {
-            string128 scope_section;
-            _GetItem(str, i, scope_section);
-            m_scopes.push_back(scope_section);
-        }
+        string128 scope_section;
+        _GetItem(str, i, scope_section);
+        m_scopes.push_back(scope_section);
     }
-    else
-    {
-        return false;
-    }   
+
     return true;
 }
 
@@ -767,7 +749,7 @@ BOOL CWeapon::net_Spawn(CSE_Abstract* DC)
     UpdateAddonsVisibility();
     InitAddons();
 
-    if (IsScopeAttached() && !ScopeIsHasTexture && !bMarkIsLoaded)
+    if (IsScopeAttached() && !bScopeHasTexture && !bMarkIsLoaded)
     {
         LoadDefaultMark();
     }
@@ -1151,7 +1133,7 @@ void CWeapon::UpdateSecondVP()
     Device.m_SecondViewport.SetSVPActive(bCond_1 && bCond_2 && bCond_3);
 }
 
-bool CWeapon::bInZoomRightNow()
+bool CWeapon::bInZoomRightNow() const
 {
    return m_zoom_params.m_fZoomRotationFactor > 0.05f;
 }
@@ -1181,19 +1163,10 @@ void CWeapon::ChangePrevMark()
 
 void CWeapon::UpdateMark()
 {
-    bool b_is_active_item = (m_pInventory != NULL) && (m_pInventory->ActiveItem() == this);
+    bool b_is_active_item = m_pInventory && (m_pInventory->ActiveItem() == this);
 
-    if (!b_is_active_item)
+    if (!IsScopeAttached() || bScopeHasTexture || !b_is_active_item)
         return;
-
-    //R_ASSERT(ParentIsActor() && b_is_active_item); // Эта функция должна вызываться только для оружия в руках нашего игрока
-
-    if (!IsScopeAttached() || ScopeIsHasTexture)
-        return;
-
-    //CActor* pActor = H_Parent()->cast_actor();
-
-
 
     if (!marks.empty())
         ChangeCurrentMark(marks[current_mark].c_str());

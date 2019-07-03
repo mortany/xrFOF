@@ -548,7 +548,7 @@ bool CWeaponMagazinedWGrenade::UseScopeTexture()
     if (IsGrenadeLauncherAttached() && m_bGrenadeMode)
         return false;
 
-    return ScopeIsHasTexture;
+    return bScopeHasTexture;
 };
 
 float CWeaponMagazinedWGrenade::CurrentZoomFactor()

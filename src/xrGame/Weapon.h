@@ -32,6 +32,59 @@ public:
     CWeapon();
     virtual ~CWeapon();
 
+    //Mortan: оружейные правки, из шокера и мои
+    bool bUseAltScope;
+    bool bScopeIsLoaded;
+    bool bMarkIsLoaded;
+    bool bScopeHasTexture;
+
+    bool LoadNewScopes(LPCSTR section);
+    bool LoadScopeTexture(LPCSTR section);
+    bool LoadMarks(pcstr section);
+    bool bInZoomRightNow() const;
+
+    void ChangeCurrentMark(pcstr mark);
+    void LoadOriginalScopes(LPCSTR section);
+    void LoadMODParams(pcstr section);
+
+    void UpdateAltScope();
+    void UpdateMark();
+    void LoadDefaultMark();
+    // Контролер переключения маркера
+    void ChangeNextMark();
+    void ChangePrevMark();
+    
+    shared_str GetNameWithAttachment();
+    const shared_str GetScopeName() const;
+
+    int GetScopeX();
+    int GetScopeY();
+    u8 current_mark;    
+
+    using SCOPES_VECTOR = xr_vector<shared_str>;
+    SCOPES_VECTOR marks;
+
+    //Второй рендер
+    float CWeapon::GetSecondVPFov() const;
+    IC float GetZRotatingFactor()    const { return m_zoom_params.m_fZoomRotationFactor; }
+    IC float GetSecondVPZoomFactor() const { return m_zoom_params.m_fSecondVPFovFactor; }
+    IC float IsSecondVPZoomPresent() const { return GetSecondVPZoomFactor() > 0.000f; }
+
+    void UpdateSecondVP();
+
+    //Отвечают за коллизию
+    //TODO: переработать коллизию
+    float m_hud_FOV_add_mod_when_zoom;
+    float m_hud_FOV_add_mod;
+    float m_nearwall_dist_max;
+    float m_nearwall_dist_min;
+    float m_nearwall_last_hud_fov;
+    float m_nearwall_target_hud_fov;
+    float m_nearwall_speed_mod;
+
+    float GetHudFov();
+    //End addon section
+    //============================================================================================
     // Generic
     virtual void Load(LPCSTR section);
 
@@ -61,63 +114,6 @@ public:
     virtual void OnH_B_Independent(bool just_before_destroy);
     virtual void OnH_A_Independent();
     virtual void OnEvent(NET_Packet& P, u16 type); // {inherited::OnEvent(P,type);}
-
-    //Mortan: оружейные правки, из шокера и мои
-    bool UseAltScope;
-    void UpdateAltScope();
-    bool ScopeIsHasTexture;
-    shared_str GetNameWithAttachment();
-    int GetScopeX();
-    int GetScopeY();
-    const shared_str GetScopeName() const;
-    bool LoadNewScopes(LPCSTR section);
-    void LoadOriginalScopes(LPCSTR section);
-    bool LoadScopeTexture(LPCSTR section);
-    bool bScopeIsLoaded;
-    bool bMarkIsLoaded;
-
-	//Отвечает за замену прицельной марки коллиматора через особый шейдер
-    u8 current_mark;
-
-	// Контролер переключения маркера
-    void ChangeNextMark();
-    void ChangePrevMark();
-
-	// Дефотные параметры и обновлениме марки
-    bool LoadMarks(pcstr section);
-    void UpdateMark();
-    void ChangeCurrentMark(pcstr mark);
-    void LoadDefaultMark();
-
-    bool bInZoomRightNow();
-
-	// Хранилище
-    
-    using SCOPES_VECTOR = xr_vector<shared_str>;
-    SCOPES_VECTOR marks;
-
-    //Второй рендер
-    float CWeapon::GetSecondVPFov() const;
-    IC float GetZRotatingFactor()    const { return m_zoom_params.m_fZoomRotationFactor; }
-    IC float GetSecondVPZoomFactor() const { return m_zoom_params.m_fSecondVPFovFactor; }
-    IC float IsSecondVPZoomPresent() const { return GetSecondVPZoomFactor() > 0.000f; }
-
-    void LoadMODParams(pcstr section);
-
-    void UpdateSecondVP();
-
-    //Отвечают за коллизию
-    //TODO: переработать коллизию
-    float m_hud_FOV_add_mod_when_zoom;
-    float m_hud_FOV_add_mod;
-    float m_nearwall_dist_max;
-    float m_nearwall_dist_min;
-    float m_nearwall_last_hud_fov;
-    float m_nearwall_target_hud_fov;
-    float m_nearwall_speed_mod;
-
-    float GetHudFov();
-    //End addon section
 
     virtual void Hit(SHit* pHDS);
 

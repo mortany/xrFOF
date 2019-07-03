@@ -934,7 +934,7 @@ bool CWeaponMagazined::CanAttach(PIItem pIItem)
         auto it = m_scopes.begin();
         for (; it != m_scopes.end(); it++)
         {
-            if (!UseAltScope)
+            if (!bUseAltScope)
             {
                 if (pSettings->r_string((*it), "scope_name") == pIItem->object().cNameSect())
                     return true;
@@ -968,7 +968,7 @@ bool CWeaponMagazined::CanDetach(const char* item_section_name)
         auto it = m_scopes.begin();
         for (; it != m_scopes.end(); it++)
         {
-            if (!UseAltScope)
+            if (!bUseAltScope)
             {
                 if (pSettings->r_string((*it), "scope_name") == item_section_name)
                     return true;
@@ -1008,7 +1008,7 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
         auto it = m_scopes.begin();
         for (; it != m_scopes.end(); it++)
         {
-            if (!UseAltScope)
+            if (!bUseAltScope)
             {
                 if (pSettings->r_string((*it), "scope_name") == pIItem->object().cNameSect())
                     m_cur_scope = u8(it - m_scopes.begin());
@@ -1062,7 +1062,7 @@ bool CWeaponMagazined::DetachScope(const char* item_section_name, bool b_spawn_i
     auto it = m_scopes.begin();
     for (; it != m_scopes.end(); it++)
     {
-        if (!UseAltScope)
+        if (!bUseAltScope)
         {
             iter_scope_name = pSettings->r_string((*it), "scope_name");
         }
@@ -1144,12 +1144,12 @@ void CWeaponMagazined::InitAddons()
         shared_str scope_tex_name;
         if (m_eScopeStatus == ALife::eAddonAttachable)
         {
-            ScopeIsHasTexture = LoadScopeTexture(GetScopeName().c_str());
+            bScopeHasTexture = LoadScopeTexture(GetScopeName().c_str());
             m_zoom_params.m_fScopeZoomFactor = pSettings->r_float(GetScopeName(), "scope_zoom_factor");
             m_fRTZoomFactor = m_zoom_params.m_fScopeZoomFactor;
             if (!GEnv.isDedicatedServer)
             {
-                if (ScopeIsHasTexture)
+                if (bScopeHasTexture)
                 {
                     m_zoom_params.m_sUseZoomPostprocess =
                         READ_IF_EXISTS(pSettings, r_string, GetScopeName(), "scope_nightvision", 0);
@@ -1173,8 +1173,8 @@ void CWeaponMagazined::InitAddons()
             m_fRTZoomFactor = m_zoom_params.m_fScopeZoomFactor;
             if (!GEnv.isDedicatedServer)
             {
-                ScopeIsHasTexture = LoadScopeTexture(cNameSect().c_str());
-                if (ScopeIsHasTexture)
+                bScopeHasTexture = LoadScopeTexture(cNameSect().c_str());
+                if (bScopeHasTexture)
                 {
                     m_zoom_params.m_sUseZoomPostprocess =
                         READ_IF_EXISTS(pSettings, r_string, cNameSect(), "scope_nightvision", 0);

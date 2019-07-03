@@ -82,7 +82,7 @@ public:
     virtual void FireEnd();
     virtual void Reload();
 
-    virtual bool UseScopeTexture() { return ScopeIsHasTexture; };
+    virtual bool UseScopeTexture() { return bScopeHasTexture; };
 
     virtual void UpdateCL();
     virtual void net_Destroy();

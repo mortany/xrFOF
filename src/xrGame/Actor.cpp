@@ -1040,9 +1040,8 @@ void CActor::UpdateCL()
             g_pGamePersistent->m_pGShaderConstants->hud_params.x = pWeapon->GetZRotatingFactor(); //--#SM+#--
             g_pGamePersistent->m_pGShaderConstants->hud_params.y = pWeapon->GetSecondVPFov(); //--#SM+#--
 
-            float x = pWeapon->bInZoomRightNow() ? 1.0f : 0.0f;
-
-            g_pGamePersistent->m_pGShaderConstants->collimator_mark.x = x;
+            bool bUseMark = !!pWeapon->bInZoomRightNow();
+            g_pGamePersistent->m_pGShaderConstants->collimator_mark.x = bUseMark;
         }
     }
     else
