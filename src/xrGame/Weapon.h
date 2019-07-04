@@ -42,6 +42,7 @@ public:
     bool LoadScopeTexture(LPCSTR section);
     bool LoadMarks(pcstr section);
     bool bInZoomRightNow() const;
+    bool bDetachScope(const char* item_section_name,u8 mark = 0);
 
     void ChangeCurrentMark(pcstr mark);
     void LoadOriginalScopes(LPCSTR section);

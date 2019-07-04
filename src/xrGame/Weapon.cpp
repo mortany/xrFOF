@@ -1327,6 +1327,35 @@ bool CWeapon::SwitchAmmoType(u32 flags)
     return true;
 }
 
+
+//#include <alife_simulator_script.cpp>
+
+bool CWeapon::bDetachScope(const char* item_section_name, u8 mark)
+{
+    if (OnClient())
+        return true;
+
+    CSE_Abstract* obj = Level().Server->GetGameState()->get_entity_from_eid(H_Parent()->ID());
+    if (obj)
+    {
+        CSE_Abstract* D = obj->cast_alife_object()->alife().spawn_item_2(obj->cast_alife_object()->m_alife_simulator, item_section_name, Position(), ai_location().level_vertex_id(), ai_location().game_vertex_id(), H_Parent()->ID());
+        if (D)
+        {
+            //CSE_ALifeItem* item = smart_cast<CSE_ALifeItem*>(D);
+            //item->m_fCondition = condition-0.4f;
+
+            NET_Packet P;
+            u_EventGen(P, GE_COLLIMATOR_MARK_UPDATE, D->ID);
+            P.w_u8(mark);
+            u_EventSend(P);
+        }
+    }
+
+    current_mark = 0;
+
+    return true;
+}
+
 void CWeapon::SpawnAmmo(u32 boxCurr, LPCSTR ammoSect, u32 ParentID)
 {
     if (!m_ammoTypes.size())
@@ -1569,6 +1598,7 @@ void CWeapon::UpdateHUDAddonsVisibility()
     }
     else if (m_eGrenadeLauncherStatus == ALife::eAddonPermanent)
         HudItemData()->set_bone_visible(wpn_grenade_launcher, TRUE, TRUE);
+
 }
 
 void CWeapon::UpdateAddonsVisibility()

@@ -1039,15 +1039,17 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 
     if (result)
     {
-        if (b_send_event && OnServer())
-        {
-            //уничтожить подсоединенную вещь из инвентаря
-            //.			pIItem->Drop					();
-            pIItem->object().DestroyObject();
-        };
         UpdateAltScope();
         UpdateAddonsVisibility();
         InitAddons();
+
+        if (pScope && !bScopeHasTexture)
+            current_mark = pScope->current_mark;
+
+        if (b_send_event && OnServer())
+        {
+            pIItem->object().DestroyObject();
+        };
 
         return true;
     }
@@ -1089,13 +1091,18 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item)
             Msg("ERROR: scope addon already detached.");
             return true;
         }
+
+        bool bIsCollimator = !bScopeHasTexture;
+
         m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonScope;
-        current_mark = 0;
         UpdateAltScope();
         UpdateAddonsVisibility();
-        InitAddons();
+        InitAddons();        
 
-        return CInventoryItemObject::Detach(item_section_name, b_spawn_item);
+        if (bIsCollimator)
+            return bDetachScope(item_section_name, current_mark);
+        else
+            return CInventoryItemObject::Detach(item_section_name, b_spawn_item);        
     }
     else if (m_eSilencerStatus == ALife::eAddonAttachable && (m_sSilencerName == item_section_name))
     {

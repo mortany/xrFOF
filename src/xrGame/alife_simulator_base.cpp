@@ -91,6 +91,41 @@ void CALifeSimulatorBase::reload(LPCSTR section)
     m_initialized = true;
 }
 
+
+CSE_Abstract* CALifeSimulatorBase::spawn_item_2(CALifeSimulator* self, LPCSTR section, const Fvector& position, u32 level_vertex_id,
+    GameGraph::_GRAPH_ID game_vertex_id, u16 parent_id)
+{
+    if (parent_id == ALife::_OBJECT_ID(-1))
+        return (self->spawn_item(section, position, level_vertex_id, game_vertex_id, parent_id));
+
+    CSE_ALifeDynamicObject* object = ai().alife().objects().object(parent_id, true);
+    if (!object)
+    {
+        Msg("! invalid parent id [%d] specified", parent_id);
+        return (0);
+    }
+
+    if (!object->m_bOnline)
+        return (self->spawn_item(section, position, level_vertex_id, game_vertex_id, parent_id));
+
+    NET_Packet packet;
+    packet.w_begin(M_SPAWN);
+    packet.w_stringZ(section);
+
+    CSE_Abstract* item = self->spawn_item(section, position, level_vertex_id, game_vertex_id, parent_id, false);
+    item->Spawn_Write(packet, FALSE);
+    self->server().FreeID(item->ID, 0);
+    F_entity_Destroy(item);
+
+    ClientID clientID;
+    clientID.set(0xffff);
+
+    u16 dummy;
+    packet.r_begin(dummy);
+    VERIFY(dummy == M_SPAWN);
+    return (self->server().Process_spawn(packet, clientID));
+}
+
 CSE_Abstract* CALifeSimulatorBase::spawn_item(LPCSTR section, const Fvector& position, u32 level_vertex_id,
     GameGraph::_GRAPH_ID game_vertex_id, u16 parent_id, bool registration)
 {
