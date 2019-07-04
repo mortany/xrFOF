@@ -14,6 +14,12 @@ public:
 
     virtual void Load(LPCSTR section);
 
+	//[FFT++]
+
+    float fConditionDecreaseByGrenade;
+
+	//
+
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Export(NET_Packet& P);

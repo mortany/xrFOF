@@ -20,6 +20,7 @@
 CWeaponMagazinedWGrenade::CWeaponMagazinedWGrenade(ESoundTypes eSoundType) : CWeaponMagazined(eSoundType)
 {
     m_ammoType2 = 0;
+    fConditionDecreaseByGrenade = 0.0f;
     m_bGrenadeMode = false;
 }
 
@@ -35,6 +36,11 @@ void CWeaponMagazinedWGrenade::Load(LPCSTR section)
     m_sounds.LoadSound(section, "snd_switch", "sndSwitch", true, m_eSoundReload);
 
     m_sFlameParticles2 = pSettings->r_string(section, "grenade_flame_particles");
+
+    if (m_eGrenadeLauncherStatus != ALife::eAddonDisabled)
+    {
+        fConditionDecreaseByGrenade = READ_IF_EXISTS(pSettings, r_float, section, "condition_shot_dec_by_grenade", 0.0f);
+    }
 
     if (m_eGrenadeLauncherStatus == ALife::eAddonPermanent)
     {
@@ -365,6 +371,8 @@ void CWeaponMagazinedWGrenade::LaunchGrenade()
             m_magazine.pop_back();
             --iAmmoElapsed;
             VERIFY((u32)iAmmoElapsed == m_magazine.size());
+
+            ChangeCondition(-fConditionDecreaseByGrenade);
 
             NET_Packet P;
             u_EventGen(P, GE_LAUNCH_ROCKET, ID());
