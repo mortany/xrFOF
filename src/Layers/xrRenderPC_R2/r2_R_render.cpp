@@ -516,7 +516,8 @@ void CRender::render_forward()
 
 void CRender::ChangeMark(pcstr mark)
 {
-    if (0 == xr_strcmp(Target->m_MarkTexture.c_str(), mark)) return;
+    if(Target->m_MarkTexture != nullptr)
+        if (0 == xr_strcmp(Target->m_MarkTexture.c_str(), mark)) return;
 
     Target->m_MarkTexture._set(mark);
 
