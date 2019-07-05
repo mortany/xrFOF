@@ -1365,22 +1365,20 @@ bool CWeapon::bDetachSilencer(const char* item_section_name, u32 shots)
     if (OnClient())
         return true;
 
-    if (shots == 0)
-        return true;
-
-    CSE_Abstract* obj = Level().Server->GetGameState()->get_entity_from_eid(H_Parent()->ID());
-    if (obj)
+    if (shots != 0)
     {
-        CSE_Abstract* D = obj->cast_alife_object()->alife().spawn_item_2(obj->cast_alife_object()->m_alife_simulator, item_section_name, Position(), ai_location().level_vertex_id(), ai_location().game_vertex_id(), H_Parent()->ID());
-        if (D)
-        {
-            //CSE_ALifeItem* item = smart_cast<CSE_ALifeItem*>(D);
-            //item->m_fCondition = condition-0.4f;
 
-            NET_Packet P;
-            u_EventGen(P, GE_ADDON_STATES_UPDATE, D->ID);
-            P.w_u32(shots);
-            u_EventSend(P);
+        CSE_Abstract* obj = Level().Server->GetGameState()->get_entity_from_eid(H_Parent()->ID());
+        if (obj)
+        {
+            CSE_Abstract* D = obj->cast_alife_object()->alife().spawn_item_2(obj->cast_alife_object()->m_alife_simulator, item_section_name, Position(), ai_location().level_vertex_id(), ai_location().game_vertex_id(), H_Parent()->ID());
+            if (D)
+            {
+                NET_Packet P;
+                u_EventGen(P, GE_ADDON_STATES_UPDATE, D->ID);
+                P.w_u32(shots);
+                u_EventSend(P);
+            }
         }
     }
 

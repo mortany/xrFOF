@@ -588,6 +588,9 @@ void CWeaponMagazined::state_Fire(float dt)
                 return;
             }
 
+            if (bSilencerCanBeBroken && silencer_shots == 0)
+                return;
+
             m_bFireSingleShot = false;
 
 
@@ -617,6 +620,11 @@ void CWeaponMagazined::state_Fire(float dt)
                 FireTrace(p1, d);
             else
                 FireTrace(m_vStartPos, m_vStartDir);
+
+            if (bSilencerCanBeBroken && silencer_shots > 0)
+            {
+                --silencer_shots;
+            }
         }
 
         if (m_iShotNum == m_iQueueSize)
@@ -625,7 +633,7 @@ void CWeaponMagazined::state_Fire(float dt)
         UpdateSounds();
     }
 
-    if (m_iNeedShotNum > 0 && iAmmoElapsed == 0)
+    if (m_iNeedShotNum > 0 && iAmmoElapsed == 0 || (bSilencerCanBeBroken && silencer_shots == 0))
     {
         StopShooting();
         SetPending(FALSE);
@@ -1059,7 +1067,6 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
             bSilencerCanBeBroken = true;
         }
             
-
         if (b_send_event && OnServer())
         {
             pIItem->object().DestroyObject();
