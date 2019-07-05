@@ -42,6 +42,7 @@ public:
     virtual void OnBeforeExplosion();
     virtual void SetCurrentParentID(u16 parent_id) { m_iCurrentParentID = parent_id; }
     IC u16 CurrentParentID() const { return m_iCurrentParentID; }
+    IC float GetFragsRadius() const { return m_fFragsRadius; }
     virtual void SetInitiator(u16 id) { SetCurrentParentID(id); }
     virtual u16 Initiator();
 

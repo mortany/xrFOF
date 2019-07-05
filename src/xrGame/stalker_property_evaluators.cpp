@@ -36,6 +36,7 @@
 #include "xrAICore/Navigation/level_graph.h"
 #include "stalker_animation_manager.h"
 #include "Weapon.h"
+#include "Grenade.h"
 
 using namespace StalkerDecisionSpace;
 
@@ -436,8 +437,8 @@ _value_type CStalkerPropertyEvaluatorShouldThrowGrenade::evaluate()
     if (!enemy)
         return (false);
 
-    if (!enemy->human_being())
-        return (false);
+    //if (!enemy->human_being())
+        //return (false);
 
     if (object().memory().visual().visible_now(enemy))
         return (false);
@@ -449,6 +450,15 @@ _value_type CStalkerPropertyEvaluatorShouldThrowGrenade::evaluate()
 
     Fvector const& position = mem_object.m_object_params.m_position;
     u32 const& enemy_vertex_id = mem_object.m_object_params.m_level_vertex_id;
+
+    CGrenade* grenade = smart_cast<CGrenade*>(object().inventory().ItemFromSlot(GRENADE_SLOT));
+
+    if (grenade)
+    {
+        if(object().Position().distance_to(position) <= grenade->GetFragsRadius())
+            return (false);
+    }
+
     if (object().Position().distance_to_sqr(position) < _sqr(10.f))
         return (false);
 
