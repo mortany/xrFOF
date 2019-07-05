@@ -14,14 +14,13 @@ using namespace luabind;
 void CScope::Load(LPCSTR section)
 {
     inherited::Load(section);
-    m_flags.set(FUsingCondition, true);
 }
 
 void CScope::OnEvent(NET_Packet& P, u16 type)
 {
     switch (type)
     {
-        case GE_COLLIMATOR_MARK_UPDATE:
+        case GE_ADDON_STATES_UPDATE:
         {
             u8 p;
             P.r_u8(current_mark);

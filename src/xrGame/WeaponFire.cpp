@@ -72,6 +72,11 @@ void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
     //	Msg("Deterioration = %f", Deterioration);
     ChangeCondition(-GetWeaponDeterioration() * l_cartridge.param_s.impair);
 
+    if (bSilencerCanBeBroken && silencer_shots > 0)
+    {
+        --silencer_shots;
+    }
+
     float fire_disp = 0.f;
     CActor* tmp_actor = NULL;
     if (!IsGameTypeSingle())

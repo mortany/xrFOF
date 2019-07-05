@@ -19,6 +19,15 @@ public:
     virtual void Load(LPCSTR section);
     virtual void net_Destroy();
 
+    virtual void save(NET_Packet& output_packet);
+    virtual void load(IReader& input_packet);
+    virtual void OnEvent(NET_Packet& P, u16 type);
+
+    u32 iMaxShots;
+    u32 iCurrentShots;
+    bool bCanBeBroken;
+    bool bShotsIsLoaded;
+
     virtual void OnH_A_Chield();
     virtual void OnH_B_Independent(bool just_before_destroy);
 

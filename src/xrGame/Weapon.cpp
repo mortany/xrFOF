@@ -85,8 +85,6 @@ CWeapon::CWeapon()
 
     bUseAltScope = false;
     bScopeHasTexture = false;
-    bScopeIsLoaded = false;
-    bMarkIsLoaded = false;
     m_nearwall_last_hud_fov = psHUD_FOV_def;
     m_zoom_params.m_fSecondVPFovFactor = 0.0f;
 }
@@ -541,6 +539,7 @@ void CWeapon::Load(LPCSTR section)
         m_sSilencerName = pSettings->r_string(section, "silencer_name");
         m_iSilencerX = pSettings->r_s32(section, "silencer_x");
         m_iSilencerY = pSettings->r_s32(section, "silencer_y");
+        bSilencerCanBeBroken = pSettings->line_exist(m_sSilencerName.c_str(), "max_shots");
     }
 
     if (m_eGrenadeLauncherStatus == ALife::eAddonAttachable)
@@ -735,7 +734,7 @@ BOOL CWeapon::net_Spawn(CSE_Abstract* DC)
             m_magazine.push_back(m_DefaultCartridge);
     }
 
-    if (E->cur_scope != u8(-1) && !bScopeIsLoaded)
+    if (E->cur_scope != u8(-1) && !bIsCurrentlyLoaded)
     {
         if (E->cur_scope < m_scopes.size() && m_scopes.size() > 1)
         {
@@ -744,14 +743,19 @@ BOOL CWeapon::net_Spawn(CSE_Abstract* DC)
         }
     }
 
-
     UpdateAltScope();
     UpdateAddonsVisibility();
     InitAddons();
 
-    if (IsScopeAttached() && !bScopeHasTexture && !bMarkIsLoaded)
+    if (IsScopeAttached() && !bScopeHasTexture && !bIsCurrentlyLoaded)
     {
         LoadDefaultMark();
+    }
+
+    if (IsSilencerAttached() && bSilencerCanBeBroken && !bIsCurrentlyLoaded)
+    {
+        silencer_shots = READ_IF_EXISTS(pSettings, r_u32, GetSilencerName().c_str(), "max_shots", 0);
+        bSilencerCanBeBroken = silencer_shots > 0;
     }
 
     m_dwWeaponIndependencyTime = 0;
@@ -865,6 +869,7 @@ void CWeapon::save(NET_Packet& output_packet)
     save_data(m_zoom_params.m_bIsZoomModeNow, output_packet);
     save_data(m_bRememberActorNVisnStatus, output_packet);
     save_data(current_mark, output_packet);
+    save_data(silencer_shots, output_packet);
 }
 
 void CWeapon::load(IReader& input_packet)
@@ -872,12 +877,10 @@ void CWeapon::load(IReader& input_packet)
     inherited::load(input_packet);
     load_data(iAmmoElapsed, input_packet);
     load_data(m_cur_scope, input_packet);
-    bScopeIsLoaded = true;
     load_data(m_flagsAddOnState, input_packet);
     UpdateAddonsVisibility();
     load_data(m_ammoType, input_packet);
     load_data(m_zoom_params.m_bIsZoomModeNow, input_packet);
-
     if (m_zoom_params.m_bIsZoomModeNow)
         OnZoomIn();
     else
@@ -894,7 +897,8 @@ void CWeapon::load(IReader& input_packet)
     else
         current_mark = temp;
 
-    bMarkIsLoaded = true;
+    load_data(silencer_shots, input_packet);
+    bIsCurrentlyLoaded = true;
 }
 
 void CWeapon::OnEvent(NET_Packet& P, u16 type)
@@ -1345,13 +1349,43 @@ bool CWeapon::bDetachScope(const char* item_section_name, u8 mark)
             //item->m_fCondition = condition-0.4f;
 
             NET_Packet P;
-            u_EventGen(P, GE_COLLIMATOR_MARK_UPDATE, D->ID);
+            u_EventGen(P, GE_ADDON_STATES_UPDATE, D->ID);
             P.w_u8(mark);
             u_EventSend(P);
         }
     }
 
     current_mark = 0;
+
+    return true;
+}
+
+bool CWeapon::bDetachSilencer(const char* item_section_name, u32 shots)
+{
+    if (OnClient())
+        return true;
+
+    if (shots == 0)
+        return true;
+
+    CSE_Abstract* obj = Level().Server->GetGameState()->get_entity_from_eid(H_Parent()->ID());
+    if (obj)
+    {
+        CSE_Abstract* D = obj->cast_alife_object()->alife().spawn_item_2(obj->cast_alife_object()->m_alife_simulator, item_section_name, Position(), ai_location().level_vertex_id(), ai_location().game_vertex_id(), H_Parent()->ID());
+        if (D)
+        {
+            //CSE_ALifeItem* item = smart_cast<CSE_ALifeItem*>(D);
+            //item->m_fCondition = condition-0.4f;
+
+            NET_Packet P;
+            u_EventGen(P, GE_ADDON_STATES_UPDATE, D->ID);
+            P.w_u32(shots);
+            u_EventSend(P);
+        }
+    }
+
+    silencer_shots = 0;
+    bSilencerCanBeBroken = false;
 
     return true;
 }

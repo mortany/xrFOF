@@ -148,7 +148,14 @@ void CWeaponMagazined::Load(LPCSTR section)
 
 void CWeaponMagazined::FireStart()
 {
-    if (!IsMisfire())
+    if (bSilencerCanBeBroken && silencer_shots == 0)
+    {
+        if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
+            CurrentGameUI()->AddCustomStatic("silencer_broken", true);
+
+        OnEmptyClick();
+    }
+    else if (!IsMisfire())
     {
         if (IsValid())
         {
@@ -1046,6 +1053,9 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
         if (pScope && !bScopeHasTexture)
             current_mark = pScope->current_mark;
 
+        if (pSilencer && bSilencerCanBeBroken)
+            silencer_shots = pSilencer->iCurrentShots;
+
         if (b_send_event && OnServer())
         {
             pIItem->object().DestroyObject();
@@ -1115,7 +1125,11 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item)
 
         UpdateAddonsVisibility();
         InitAddons();
-        return CInventoryItemObject::Detach(item_section_name, b_spawn_item);
+
+        if (bSilencerCanBeBroken)
+            return bDetachSilencer(item_section_name, silencer_shots);
+        else
+            return CInventoryItemObject::Detach(item_section_name, b_spawn_item);        
     }
     else if (m_eGrenadeLauncherStatus == ALife::eAddonAttachable && (m_sGrenadeLauncherName == item_section_name))
     {

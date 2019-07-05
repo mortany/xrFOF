@@ -34,15 +34,16 @@ public:
 
     //Mortan: оружейные правки, из шокера и мои
     bool bUseAltScope;
-    bool bScopeIsLoaded;
-    bool bMarkIsLoaded;
     bool bScopeHasTexture;
+    bool bSilencerCanBeBroken;
+    bool bIsCurrentlyLoaded;
 
     bool LoadNewScopes(LPCSTR section);
     bool LoadScopeTexture(LPCSTR section);
     bool LoadMarks(pcstr section);
     bool bInZoomRightNow() const;
     bool bDetachScope(const char* item_section_name,u8 mark = 0);
+    bool bDetachSilencer(const char* item_section_name, u32 shots = 0);
 
     void ChangeCurrentMark(pcstr mark);
     void LoadOriginalScopes(LPCSTR section);
@@ -60,7 +61,8 @@ public:
 
     int GetScopeX();
     int GetScopeY();
-    u8 current_mark;    
+    u8 current_mark;
+    u32 silencer_shots;
 
     using SCOPES_VECTOR = xr_vector<shared_str>;
     SCOPES_VECTOR marks;
