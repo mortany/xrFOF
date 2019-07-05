@@ -206,9 +206,9 @@ void CUICellItem::UpdateConditionProgressBar()
     {
         PIItem itm = static_cast<PIItem>(m_pData);
 
-        if (itm && itm->IsUsingCondition())
+        if (itm && (itm->IsUsingCondition() || itm->IsUsingCustomCondition()))
         {
-            float cond = itm->GetCondition();
+            float cond = itm->IsUsingCustomCondition() ? itm->GetCustomCondition() : itm->GetCondition();
 
             CEatableItem* eitm = smart_cast<CEatableItem*>(itm);
             if (eitm)

@@ -68,6 +68,7 @@ CInventoryItem::CInventoryItem()
     m_Description = "";
     m_section_id = 0;
     m_flags.set(FIsHelperItem, FALSE);
+    m_flags.set(FUseCustomCondition, FALSE);
 }
 
 CInventoryItem::~CInventoryItem()

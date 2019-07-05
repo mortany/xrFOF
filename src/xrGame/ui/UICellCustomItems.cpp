@@ -44,7 +44,13 @@ bool CUIInventoryCellItem::EqualTo(CUICellItem* itm)
     {
         return false;
     }
-    if (!fsimilar(object()->GetCondition(), ci->object()->GetCondition(), 0.01f))
+
+    if (object()->IsUsingCustomCondition())
+    {
+        if(!fsimilar(object()->GetCustomCondition(), ci->object()->GetCustomCondition(), 0.01f))
+            return false;
+    }
+    else if (!fsimilar(object()->GetCondition(), ci->object()->GetCondition(), 0.01f))
     {
         return false;
     }

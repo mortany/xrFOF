@@ -84,6 +84,7 @@ protected:
         FInInterpolate = (1 << 10),
         FIsQuestItem = (1 << 11),
         FIsHelperItem = (1 << 12),
+        FUseCustomCondition = (1 << 13),
     };
 
     Flags16 m_flags;
@@ -92,6 +93,9 @@ protected:
 public:
     CInventoryItem();
     virtual ~CInventoryItem();
+
+    virtual float GetCustomCondition() const { return 1.0f; };
+    virtual bool IsUsingCustomCondition() const { return m_flags.test(FUseCustomCondition); }
 
 public:
     virtual void Load(LPCSTR section);

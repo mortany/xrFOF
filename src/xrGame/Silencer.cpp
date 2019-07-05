@@ -27,11 +27,24 @@ BOOL CSilencer::net_Spawn(CSE_Abstract* DC)
     return bResult;
 }
 
+float CSilencer::GetCustomCondition() const
+{
+    if (!bCanBeBroken)
+        return 1.0f;
+    else
+    {
+        float temp = iCurrentShots * (1.0f / iMaxShots);
+        clamp(temp, 0.0f, 1.0f);
+        return temp;
+    }
+}
+
 void CSilencer::Load(LPCSTR section) 
 { 
     inherited::Load(section);
     iMaxShots = READ_IF_EXISTS(pSettings, r_u32, section, "max_shots", 0);
     bCanBeBroken = iMaxShots > 0;
+    m_flags.set(FUseCustomCondition, TRUE);
 }
 
 void CSilencer::OnEvent(NET_Packet& P, u16 type)

@@ -25,6 +25,9 @@ public:
 
     u32 iMaxShots;
     u32 iCurrentShots;
+
+    virtual float GetCustomCondition() const;
+
     bool bCanBeBroken;
     bool bShotsIsLoaded;
 
