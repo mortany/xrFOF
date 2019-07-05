@@ -1053,8 +1053,12 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
         if (pScope && !bScopeHasTexture)
             current_mark = pScope->current_mark;
 
-        if (pSilencer && bSilencerCanBeBroken)
+        if (pSilencer && pSilencer->bCanBeBroken)
+        {
             silencer_shots = pSilencer->iCurrentShots;
+            bSilencerCanBeBroken = true;
+        }
+            
 
         if (b_send_event && OnServer())
         {
